@@ -31,26 +31,10 @@ ApplicationWindow {
         }
 
 
-        MouseArea {
+
+        MultiPointTouchArea {
             id: area
             anchors.fill: parent
-
-            onPressed: {
-                canvas.lastX = mouseX;
-                canvas.lastY = mouseY;
-            }
-
-            onPositionChanged: {
-                canvas.requestPaint();
-            }
-        }
-
-        /*MultiPointTouchArea {
-            id: area
-            anchors.fill: parent
-
-            property var listX: []
-            property var listY: []
 
             minimumTouchPoints: 1
             maximumTouchPoints: 5
@@ -63,17 +47,9 @@ ApplicationWindow {
             ]
 
             onPressed: {
+                canvas.lastX = this.touchPoints[0].x;
+                canvas.lastY = this.touchPoints[0].y;
 
-                canvas.nPointIndex = 0;
-                for(let i = 0; i < 5; ++i)
-                {
-                    if(this.touchPoints[i].pressed)
-                    {
-                        listX[i] = this.touchPoints[i].x;
-                        listY[i] = this.touchPoints[i].y;
-                        canvas.nPointIndex = i;
-                    }
-                }
                 canvas.requestPaint();
             }
 
@@ -81,7 +57,7 @@ ApplicationWindow {
                 canvas.requestPaint();
             }
 
-        }*/
+        }
 
 
 
@@ -114,8 +90,8 @@ ApplicationWindow {
             {
                 let angle = Math.PI / 180 * (360.0 / axes);
                 let old_pos = getPolarCoords(lastX, lastY);
-                lastX = area.mouseX;
-                lastY = area.mouseY;
+                lastX = area.touchPoints[0].x;
+                lastY = area.touchPoints[0].y;
                 let new_pos = getPolarCoords(lastX, lastY);
 
                 for(let axe = 0; axe < axes; ++axe)
