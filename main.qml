@@ -5,8 +5,8 @@ import QtQuick.Layouts 1.12
 
 ApplicationWindow {
     visible: true
-    width: 800
-    height: 800
+    minimumWidth: 400
+    minimumHeight: 400
     title: qsTr("paint")
 
     Canvas {
@@ -16,12 +16,13 @@ ApplicationWindow {
         renderTarget: Canvas.FramebufferObject
 
         property bool symmetry: true
-        property int axes: 8
+        property int axes: 5
         property int brushSize: 1
         property int nPointIndex: 0
 
-        property int lastX: 0
-        property int lastY: 0
+        property var color: {'h':110, 's':110, 'l':110}
+        property var listlastX: [0]
+        property var listlastY: [0]
 
         function clear()
         {
@@ -36,6 +37,9 @@ ApplicationWindow {
             id: area
             anchors.fill: parent
 
+            property var listX: [0]
+            property var listY: [0]
+
             minimumTouchPoints: 1
             maximumTouchPoints: 5
             touchPoints: [
@@ -47,13 +51,37 @@ ApplicationWindow {
             ]
 
             onPressed: {
-                canvas.lastX = this.touchPoints[0].x;
-                canvas.lastY = this.touchPoints[0].y;
-
-                canvas.requestPaint();
+                canvas.nPointIndex = 0;
+                for(let i = 0; i < 5; ++i)
+                {
+                    if(this.touchPoints[i].pressed)
+                    {
+                        listX[i] = this.touchPoints[i].x;
+                        listY[i] = this.touchPoints[i].y;
+                        canvas.listlastX[i] = this.touchPoints[i].x;
+                        canvas.listlastY[i] = this.touchPoints[i].y;
+                        canvas.nPointIndex = i;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
 
             onTouchUpdated: {
+                for(let i = 0; i < 5; ++i)
+                {
+                    if(this.touchPoints[i].pressed)
+                    {
+                        listX[i] = this.touchPoints[i].x;
+                        listY[i] = this.touchPoints[i].y;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
                 canvas.requestPaint();
             }
 
@@ -82,21 +110,25 @@ ApplicationWindow {
 
         onPaint: {
             let ctx = getContext("2d");
+
             ctx.lineCap = "round";
             ctx.lineWidth = brushSize;
+            ctx.strokeStyle  = `hsl( ${color.h}, ${color.s}, ${color.l})`;
+
             ctx.beginPath();
 
             for(let i = 0; i <= nPointIndex; ++i)
             {
-                let angle = Math.PI / 180 * (360.0 / axes);
-                let old_pos = getPolarCoords(lastX, lastY);
-                lastX = area.touchPoints[0].x;
-                lastY = area.touchPoints[0].y;
-                let new_pos = getPolarCoords(lastX, lastY);
 
-                for(let axe = 0; axe < axes; ++axe)
+                if(axes > 1 || symmetry)
                 {
-                    if(new_pos.radius < height / 2)
+                    let angle = Math.PI / 180 * (360.0 / axes);
+                    let old_pos = getPolarCoords(listlastX[i], listlastY[i]);
+                    listlastX[i] = area.listX[i];
+                    listlastY[i] = area.listY[i];
+                    let new_pos = getPolarCoords(listlastX[i], listlastY[i]);
+
+                    for(let axe = 0; axe < axes; ++axe)
                     {
                         let start = Qt.point(width / 2 +  Math.cos(old_pos.angle + (angle * axe)) * old_pos.radius,
                                              height / 2 +  Math.sin(old_pos.angle + (angle * axe)) * old_pos.radius);
@@ -108,16 +140,22 @@ ApplicationWindow {
 
                         if(symmetry)
                         {
-                            start = Qt.point(width / 2 +  Math.sin(old_pos.angle + (angle * axe + angle)) * old_pos.radius,
-                                             height / 2 +  Math.cos(old_pos.angle + (angle * axe + angle)) * old_pos.radius);
-                            end = Qt.point(width / 2 +  Math.sin(new_pos.angle + (angle * axe + angle)) * new_pos.radius,
-                                           height / 2 + Math.cos(new_pos.angle + (angle * axe + angle)) * new_pos.radius);
+                            start = Qt.point(width / 2 +  Math.cos( (Math.PI - old_pos.angle + (angle * axe))) * old_pos.radius,
+                                                 height / 2 +  Math.sin( (Math.PI - old_pos.angle + (angle * axe))) * old_pos.radius);
+                            end = Qt.point(width / 2 +  Math.cos( (Math.PI - new_pos.angle + (angle * axe))) * new_pos.radius,
+                                               height / 2 + Math.sin( (Math.PI - new_pos.angle + (angle * axe))) * new_pos.radius);
 
                             ctx.moveTo(start.x, start.y);
                             ctx.lineTo(end.x, end.y);
                         }
                     }
-
+                }
+                else
+                {
+                    ctx.moveTo(listlastX[i], listlastY[i]);
+                    listlastX[i] = area.listX[i];
+                    listlastY[i] = area.listY[i];
+                    ctx.lineTo(listlastX[i], listlastY[i]);
                 }
             }
             ctx.stroke();
