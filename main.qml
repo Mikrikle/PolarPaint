@@ -10,9 +10,7 @@ Window {
 
     PolarCanvas {
         id: polarcanvas
-
         property Item canvas : cvs
-
         anchors.fill: parent
     }
 
@@ -73,12 +71,20 @@ Window {
         Button {
             text: "<-"
             onClicked: {
-                canvas.undo();
+                polarcanvas.canvas.undo();
             }
         }
         Button {
             text: "->"
         }
+        Button {
+            text: "X"
+            onClicked:
+            {
+                polarcanvas.canvas.clear();
+            }
+        }
+
         Item { width: 25 }
     }
 

@@ -18,13 +18,14 @@ Item {
 
         /* properties that the user can change */
         property bool symmetry: false
-        property int axes: 3
-        property int brushSize: 1
+        property int axes: 2
+        property int brushSize: 2
         property var brushColor: {'h':110, 's':110, 'l':110}
         property string backgroundColor: "#202020"
 
         /* system properties */
-        property var line: {"points": [], "size":null, "color": null }
+        property bool isRepaint: false
+        property var line: {"points": [], "size":null, "color": null, "symmetry": false, "axes":1}
         property var listLines: [{"points": [], "size":brushSize, "color": brushColor }]
         property int nLines: 0
         property int bufX: 0
@@ -33,6 +34,9 @@ Item {
 
         function clear()
         {
+            this.line =  {"points": [], "size":null, "color": null, "symmetry": false, "axes":1};
+            this.listLines = [];
+            this.nLines = 0;
             let ctx = getContext("2d");
             ctx.reset();
             this.requestPaint();
@@ -44,6 +48,9 @@ Item {
             if(listLines.length > 0)
             {
                 this.listLines.pop();
+                --nLines;
+                this.isRepaint = true;
+                this.requestPaint();
             }
         }
 
@@ -77,6 +84,8 @@ Item {
                     canvas.listLines[canvas.nLines].size = canvas.brushSize;
                     canvas.listLines[canvas.nLines].color = canvas.brushColor;
                     canvas.listLines[canvas.nLines].points = [{"x":this.touchPoints[0].x, "y":this.touchPoints[0].y}];
+                    canvas.listLines[canvas.nLines].symmetry = canvas.symmetry;
+                    canvas.listLines[canvas.nLines].axes = canvas.axes;
                     canvas.isNeedNewLine = false;
                 }
 
@@ -157,49 +166,77 @@ Item {
             return obj;
         }
 
+        function draw(old_pos, new_pos, ctx, symmetry, axes)
+        {
+            let angle = Math.PI / 180 * (360.0 / axes);
+            for(let axe = 0; axe < axes; ++axe)
+            {
+                let start = Qt.point(width / 2 +  Math.cos(old_pos.angle + (angle * axe)) * old_pos.radius,
+                                     height / 2 +  Math.sin(old_pos.angle + (angle * axe)) * old_pos.radius);
+                let end = Qt.point(width / 2 +  Math.cos(new_pos.angle + (angle * axe)) * new_pos.radius,
+                                   height / 2 + Math.sin(new_pos.angle + (angle * axe)) * new_pos.radius);
+
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+
+                if(symmetry)
+                {
+                    start = Qt.point(width / 2 +  Math.cos( (Math.PI - old_pos.angle + (angle * axe))) * old_pos.radius,
+                                     height / 2 +  Math.sin( (Math.PI - old_pos.angle + (angle * axe))) * old_pos.radius);
+                    end = Qt.point(width / 2 +  Math.cos( (Math.PI - new_pos.angle + (angle * axe))) * new_pos.radius,
+                                   height / 2 + Math.sin( (Math.PI - new_pos.angle + (angle * axe))) * new_pos.radius);
+
+                    ctx.moveTo(start.x, start.y);
+                    ctx.lineTo(end.x, end.y);
+                }
+            }
+        }
+
         onPaint: {
             let ctx = getContext("2d");
             ctx.lineCap = "round";
 
             ctx.beginPath();
 
-            let current_line = this.listLines[this.listLines.length - 1];
-            ctx.lineWidth = current_line.size;
-            ctx.strokeStyle  = `hsl( ${current_line.color.h}, ${current_line.color.s}, ${current_line.color.l})`;
 
+            if(this.isRepaint)
+            {
+                ctx.reset();
+                isRepaint = false;
+
+                for(let i = 0; i < nLines; ++i)
+                {
+                    let temp_line = this.listLines[i];
+                    ctx.lineWidth = temp_line.size;
+                    ctx.strokeStyle  = `hsl( ${temp_line.color.h}, ${temp_line.color.s}, ${temp_line.color.l})`;
+                    for(let nPoint = 0; nPoint < temp_line.points.length - 1; ++nPoint)
+                    {
+                        let old_pos = getPolarCoords(temp_line.points[nPoint].x, temp_line.points[nPoint].y);
+                        let new_pos = getPolarCoords(temp_line.points[nPoint + 1].x, temp_line.points[nPoint + 1].y);
+                        draw(old_pos, new_pos, ctx, this.symmetry, this.axes);
+                    }
+                }
+            }
+            else
+            {
+                if(this.listLines.length > 0)
+                {
+                    let current_line = this.listLines[this.listLines.length - 1];
+                    ctx.lineWidth = current_line.size;
+                    ctx.strokeStyle  = `hsl( ${current_line.color.h}, ${current_line.color.s}, ${current_line.color.l})`;
+                }
+            }
 
             for(let point = 0; point < area.pointBuffer.length; ++point)
             {
 
                 if(axes > 1 || symmetry)
                 {
-                    let angle = Math.PI / 180 * (360.0 / axes);
                     let old_pos = getPolarCoords(this.bufX, this.bufY);
                     this.bufX = area.pointBuffer[point].x;
                     this.bufY= area.pointBuffer[point].y;
                     let new_pos = getPolarCoords(this.bufX, this.bufY);
-
-                    for(let axe = 0; axe < axes; ++axe)
-                    {
-                        let start = Qt.point(width / 2 +  Math.cos(old_pos.angle + (angle * axe)) * old_pos.radius,
-                                             height / 2 +  Math.sin(old_pos.angle + (angle * axe)) * old_pos.radius);
-                        let end = Qt.point(width / 2 +  Math.cos(new_pos.angle + (angle * axe)) * new_pos.radius,
-                                           height / 2 + Math.sin(new_pos.angle + (angle * axe)) * new_pos.radius);
-
-                        ctx.moveTo(start.x, start.y);
-                        ctx.lineTo(end.x, end.y);
-
-                        if(symmetry)
-                        {
-                            start = Qt.point(width / 2 +  Math.cos( (Math.PI - old_pos.angle + (angle * axe))) * old_pos.radius,
-                                             height / 2 +  Math.sin( (Math.PI - old_pos.angle + (angle * axe))) * old_pos.radius);
-                            end = Qt.point(width / 2 +  Math.cos( (Math.PI - new_pos.angle + (angle * axe))) * new_pos.radius,
-                                           height / 2 + Math.sin( (Math.PI - new_pos.angle + (angle * axe))) * new_pos.radius);
-
-                            ctx.moveTo(start.x, start.y);
-                            ctx.lineTo(end.x, end.y);
-                        }
-                    }
+                    draw(old_pos, new_pos, ctx, this.symmetry, this.axes);
                 }
                 else
                 {
