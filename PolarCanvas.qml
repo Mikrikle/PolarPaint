@@ -16,13 +16,14 @@ Item {
         renderStrategy: Canvas.Threaded
         renderTarget: Canvas.FramebufferObject
 
-        property bool symmetry: true
-        property int axes: 6
+        /* properties that the user can change */
+        property bool symmetry: false
+        property int axes: 3
         property int brushSize: 1
-
         property var brushColor: {'h':110, 's':110, 'l':110}
         property string backgroundColor: "#202020"
 
+        /* system properties */
         property var line: {"points": [], "size":null, "color": null }
         property var listLines: [{"points": [], "size":brushSize, "color": brushColor }]
         property int nLines: 0
@@ -50,6 +51,7 @@ Item {
             id: area
             anchors.fill: parent
 
+            // points to draw at the moment
             property var pointBuffer: []
 
             minimumTouchPoints: 1
@@ -64,11 +66,13 @@ Item {
 
             onPressed: {
 
+                // updating canvas
                 canvas.bufX = this.touchPoints[0].x;
                 canvas.bufY = this.touchPoints[0].y;
 
                 if(canvas.isNeedNewLine)
                 {
+                    // create new line obj
                     canvas.listLines.push({"points": [], "size":null, "color": null });
                     canvas.listLines[canvas.nLines].size = canvas.brushSize;
                     canvas.listLines[canvas.nLines].color = canvas.brushColor;
@@ -76,6 +80,7 @@ Item {
                     canvas.isNeedNewLine = false;
                 }
 
+                // updating area
                 pointBuffer[0] = {"x":this.touchPoints[0].x, "y":this.touchPoints[0].y};
                 for(let i = 1; i < 5; ++i)
                 {
@@ -89,11 +94,13 @@ Item {
                         break;
                     }
                 }
+
                 canvas.requestPaint();
             }
 
             onReleased:
             {
+                // a new line is created only if the drawing is stopped
                 pointBuffer = [];
                 let isAllReleased = true
                 for(let i = 0; i < 5; ++i)
@@ -152,57 +159,25 @@ Item {
 
         onPaint: {
             let ctx = getContext("2d");
-
             ctx.lineCap = "round";
 
             ctx.beginPath();
 
             let current_line = this.listLines[this.listLines.length - 1];
-
             ctx.lineWidth = current_line.size;
             ctx.strokeStyle  = `hsl( ${current_line.color.h}, ${current_line.color.s}, ${current_line.color.l})`;
 
 
             for(let point = 0; point < area.pointBuffer.length; ++point)
             {
-                let old_pos = {'x' :this.bufX, 'y': this.bufY};
-                this.bufX = area.pointBuffer[point].x;
-                this.bufY= area.pointBuffer[point].y;
-                let new_pos = {'x' :this.bufX, 'y': this.bufY};
 
-                ctx.moveTo(old_pos.x, old_pos.y);
-                ctx.lineTo(new_pos.x, new_pos.y);
-            }
-
-
-
-
-            /* for(let i = 0; i < this.listLines.length; ++i)
-            {
-                let current_line = this.listLines[i];
-                if(current_line.points !== undefined)
-                {
-                    ctx.lineWidth = current_line.size;
-                    ctx.strokeStyle  = `hsl( ${current_line.color.h}, ${current_line.color.s}, ${current_line.color.l})`;
-
-                    for(let nPoint = 0; nPoint < current_line.points.length - 1; ++nPoint)
-                    {
-                        ctx.moveTo(current_line.points[nPoint].x, current_line.points[nPoint].y);
-                        ctx.lineTo(current_line.points[nPoint + 1].x, current_line.points[nPoint + 1].y);
-                    }
-                }
-            }*/
-
-
-
-            /*
                 if(axes > 1 || symmetry)
                 {
                     let angle = Math.PI / 180 * (360.0 / axes);
-                    let old_pos = getPolarCoords(listlastX[i], listlastY[i]);
-                    listlastX[i] = area.listX[i];
-                    listlastY[i] = area.listY[i];
-                    let new_pos = getPolarCoords(listlastX[i], listlastY[i]);
+                    let old_pos = getPolarCoords(this.bufX, this.bufY);
+                    this.bufX = area.pointBuffer[point].x;
+                    this.bufY= area.pointBuffer[point].y;
+                    let new_pos = getPolarCoords(this.bufX, this.bufY);
 
                     for(let axe = 0; axe < axes; ++axe)
                     {
@@ -228,12 +203,13 @@ Item {
                 }
                 else
                 {
-                    ctx.moveTo(listlastX[i], listlastY[i]);
-                    listlastX[i] = area.listX[i];
-                    listlastY[i] = area.listY[i];
-                    ctx.lineTo(listlastX[i], listlastY[i]);
+                    ctx.moveTo(this.bufX, this.bufY);
+                    this.bufX = area.pointBuffer[point].x;
+                    this.bufY= area.pointBuffer[point].y;
+                    ctx.lineTo(this.bufX, this.bufY);
                 }
-            */
+            }
+
             ctx.stroke();
         }
     }
