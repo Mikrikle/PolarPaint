@@ -27,6 +27,7 @@ Item {
         property bool isRepaint: false
         property var line: {"points": [], "size":null, "color": null, "symmetry": false, "axes":1}
         property var listLines: [{"points": [], "size":brushSize, "color": brushColor }]
+        property var deletedLines: []
         property int nLines: 0
         property int bufX: 0
         property int bufY: 0
@@ -36,7 +37,9 @@ Item {
         {
             this.line =  {"points": [], "size":null, "color": null, "symmetry": false, "axes":1};
             this.listLines = [];
+            this.deletedLines = [];
             this.nLines = 0;
+            this.isNeedNewLine = true
             let ctx = getContext("2d");
             ctx.reset();
             this.requestPaint();
@@ -45,10 +48,21 @@ Item {
 
         function undo()
         {
-            if(listLines.length > 0)
+            if(this.listLines.length > 0)
             {
-                this.listLines.pop();
-                --nLines;
+                this.deletedLines.unshift(this.listLines.pop());
+                --this.nLines;
+                this.isRepaint = true;
+                this.requestPaint();
+            }
+        }
+
+        function redo()
+        {
+            if(this.deletedLines.length > 0)
+            {
+                this.listLines.push(this.deletedLines.shift());
+                ++this.nLines;
                 this.isRepaint = true;
                 this.requestPaint();
             }
@@ -76,6 +90,7 @@ Item {
                 // updating canvas
                 canvas.bufX = this.touchPoints[0].x;
                 canvas.bufY = this.touchPoints[0].y;
+                canvas.deletedLines = [];
 
                 if(canvas.isNeedNewLine)
                 {

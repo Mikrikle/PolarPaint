@@ -1,12 +1,16 @@
 import QtQuick 2.12
-import QtQuick.Controls 2.12
+import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
+import Qt.labs.platform 1.1
 
 Window {
     visible: true
     minimumWidth: 400
-    minimumHeight: 400
+    minimumHeight: 600
     title: qsTr("paint")
+
+    Material.theme: Material.Dark
+    Material.accent: Material.Green
 
     PolarCanvas {
         id: polarcanvas
@@ -34,8 +38,8 @@ Window {
             State{
                 name: "state_disabled"
                 PropertyChanges{
-                     target: topMenu
-                     y: -topMenu.height
+                    target: topMenu
+                    y: -topMenu.height
                 }
                 PropertyChanges{
                     target: bottomMenu
@@ -68,6 +72,21 @@ Window {
         x: 0
         y: 0
         Item { width: 25 }
+
+        DelayButton {
+            Material.accent: "#FF0000"
+            text: "X"
+            delay: 400
+            onActivated:
+            {
+                checked = false;
+                progress = 0;
+                polarcanvas.canvas.clear();
+            }
+        }
+
+        Item { width: 25 }
+
         Button {
             text: "<-"
             onClicked: {
@@ -76,12 +95,19 @@ Window {
         }
         Button {
             text: "->"
+            onClicked: {
+                polarcanvas.canvas.redo();
+            }
         }
+
+
         Button {
-            text: "X"
-            onClicked:
+            text: "Menu"
+            onClicked: popup_menu.open()
+
+            MenuPopup
             {
-                polarcanvas.canvas.clear();
+                id: popup_menu
             }
         }
 
@@ -98,7 +124,8 @@ Window {
             text: "Ok"
         }
         Button {
-            text: "Cancel"
+            text: "Color"
+
         }
         Item { width: 25 }
     }

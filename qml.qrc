@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>PolarCanvas.qml</file>
+        <file>MenuPopup.qml</file>
     </qresource>
 </RCC>
