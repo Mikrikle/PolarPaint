@@ -3,6 +3,7 @@ import QtQuick 2.0
 Item {
 
     property Item cvs : canvas
+    property Item bg : background
 
     Rectangle {
         id: background
@@ -18,20 +19,21 @@ Item {
 
         /* properties that the user can change */
         property bool symmetry: false
-        property int axes: 2
-        property int brushSize: 2
-        property var brushColor: {'h':110, 's':110, 'l':110}
+        property int axes: 3
+        property int brushSize: 1
+        property string brushColor: "#55FF00"
         property string backgroundColor: "#202020"
 
         /* system properties */
         property bool isRepaint: false
         property var line: {"points": [], "size":null, "color": null, "symmetry": false, "axes":1}
-        property var listLines: [{"points": [], "size":brushSize, "color": brushColor }]
+        property var listLines: []
         property var deletedLines: []
         property int nLines: 0
         property int bufX: 0
         property int bufY: 0
-        property bool isNeedNewLine: false
+        property bool isNeedNewLine: true
+
 
         function clear()
         {
@@ -223,7 +225,7 @@ Item {
                 {
                     let temp_line = this.listLines[i];
                     ctx.lineWidth = temp_line.size;
-                    ctx.strokeStyle  = `hsl( ${temp_line.color.h}, ${temp_line.color.s}, ${temp_line.color.l})`;
+                    ctx.strokeStyle  = temp_line.color;
                     for(let nPoint = 0; nPoint < temp_line.points.length - 1; ++nPoint)
                     {
                         let old_pos = getPolarCoords(temp_line.points[nPoint].x, temp_line.points[nPoint].y);
@@ -238,7 +240,7 @@ Item {
                 {
                     let current_line = this.listLines[this.listLines.length - 1];
                     ctx.lineWidth = current_line.size;
-                    ctx.strokeStyle  = `hsl( ${current_line.color.h}, ${current_line.color.s}, ${current_line.color.l})`;
+                    ctx.strokeStyle  = current_line.color;
                 }
             }
 

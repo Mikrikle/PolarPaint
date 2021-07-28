@@ -5,17 +5,18 @@ import QtQuick.Layouts 1.12
 Popup {
 
     id: popup
+    property var cvs: null
 
     parent: Overlay.overlay
+    closePolicy: Popup.NoAutoClose
     modal: true
     focus: true
     width: parent.width - 100;
     height: parent.height - 100;
     x: Math.round((parent.width - width) / 2)
     y: Math.round((parent.height - height) / 2)
-    scale: 0
 
-    closePolicy: Popup.NoAutoClose
+    scale: 0
 
     function hide() {
         close();
@@ -43,7 +44,6 @@ Popup {
             duration: 200
         }
     }
-
 
     SwipeView {
         id: view

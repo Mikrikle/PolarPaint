@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.12
 import Qt.labs.platform 1.1
 
 Window {
+    id: main_window
     visible: true
     minimumWidth: 400
     minimumHeight: 600
@@ -71,9 +72,11 @@ Window {
         width: parent.width
         x: 0
         y: 0
-        Item { width: 25 }
+        Item { width: 10 }
 
         DelayButton {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
             Material.accent: "#FF0000"
             text: "X"
             delay: 400
@@ -85,33 +88,38 @@ Window {
             }
         }
 
-        Item { width: 25 }
+        Item { width: 10 }
 
         Button {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
             text: "<-"
             onClicked: {
                 polarcanvas.canvas.undo();
             }
         }
         Button {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
             text: "->"
             onClicked: {
                 polarcanvas.canvas.redo();
             }
         }
 
+        Item { width: 10 }
 
         Button {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
             text: "Menu"
             onClicked: popup_menu.open()
-
-            MenuPopup
-            {
+            MenuPopup {
                 id: popup_menu
             }
         }
 
-        Item { width: 25 }
+        Item { width: 10 }
     }
 
     RowLayout {
@@ -119,15 +127,50 @@ Window {
         width: parent.width
         x: 0
         y: parent.height - height
-        Item { width: 25 }
-        Button {
-            text: "Ok"
-        }
-        Button {
-            text: "Color"
+        Item { width: 10 }
 
+        Button {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            text: "Draw"
+            onClicked: {
+                popup_draw.visible = !popup_draw.visible
+            }
+            DrawPopup {
+                id: popup_draw
+                cvs: polarcanvas.canvas
+            }
         }
-        Item { width: 25 }
+
+        Button {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            text: "Brush"
+            onClicked: {
+                popup_brush.visible = !popup_brush.visible
+            }
+            BrushPopup {
+                id: popup_brush
+                cvs: polarcanvas.canvas
+            }
+        }
+
+        Button {
+            id: btn_color_indicator
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
+            highlighted: true
+            Material.accent: polarcanvas.canvas.brushColor
+            onClicked: {
+                popup_color.visible = !popup_color.visible
+            }
+            ColorPopup {
+                id: popup_color
+                cvs: polarcanvas.canvas
+            }
+        }
+
+        Item { width: 10 }
     }
 
 

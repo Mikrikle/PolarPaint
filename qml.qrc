@@ -3,5 +3,8 @@
         <file>main.qml</file>
         <file>PolarCanvas.qml</file>
         <file>MenuPopup.qml</file>
+        <file>BrushPopup.qml</file>
+        <file>ColorPopup.qml</file>
+        <file>DrawPopup.qml</file>
     </qresource>
 </RCC>
