@@ -23,25 +23,26 @@ Item {
         property int brushSize: 1
         property string brushColor: "#55FF00"
         property string backgroundColor: "#202020"
+        var prev_cvs = null;
 
         /* system properties */
-        property bool isRepaint: false
-        property var line: {"points": [], "size":null, "color": null, "symmetry": false, "axes":1}
-        property var listLines: []
-        property var deletedLines: []
-        property int nLines: 0
+        //property bool isRepaint: false
+        //property var line: {"points": [], "size":null, "color": null, "symmetry": false, "axes":1}
+        //property var listLines: []
+        //property var deletedLines: []
+        //property int nLines: 0
         property int bufX: 0
         property int bufY: 0
-        property bool isNeedNewLine: true
+        //property bool isNeedNewLine: true
 
 
         function clear()
         {
-            this.line =  {"points": [], "size":null, "color": null, "symmetry": false, "axes":1};
-            this.listLines = [];
-            this.deletedLines = [];
-            this.nLines = 0;
-            this.isNeedNewLine = true
+            //this.line =  {"points": [], "size":null, "color": null, "symmetry": false, "axes":1};
+            //this.listLines = [];
+            //this.deletedLines = [];
+            //this.nLines = 0;
+            //this.isNeedNewLine = true
             let ctx = getContext("2d");
             ctx.reset();
             this.requestPaint();
@@ -50,24 +51,24 @@ Item {
 
         function undo()
         {
-            if(this.listLines.length > 0)
+            /*if(this.listLines.length > 0)
             {
                 this.deletedLines.unshift(this.listLines.pop());
                 --this.nLines;
                 this.isRepaint = true;
                 this.requestPaint();
-            }
+            }*/
         }
 
         function redo()
         {
-            if(this.deletedLines.length > 0)
+            /*if(this.deletedLines.length > 0)
             {
                 this.listLines.push(this.deletedLines.shift());
                 ++this.nLines;
                 this.isRepaint = true;
                 this.requestPaint();
-            }
+            }*/
         }
 
         MultiPointTouchArea {
@@ -92,9 +93,9 @@ Item {
                 // updating canvas
                 canvas.bufX = this.touchPoints[0].x;
                 canvas.bufY = this.touchPoints[0].y;
-                canvas.deletedLines = [];
+                //canvas.deletedLines = [];
 
-                if(canvas.isNeedNewLine)
+                /*if(canvas.isNeedNewLine)
                 {
                     // create new line obj
                     canvas.listLines.push({"points": [], "size":null, "color": null });
@@ -104,7 +105,7 @@ Item {
                     canvas.listLines[canvas.nLines].symmetry = canvas.symmetry;
                     canvas.listLines[canvas.nLines].axes = canvas.axes;
                     canvas.isNeedNewLine = false;
-                }
+                }*/
 
                 // updating area
                 pointBuffer[0] = {"x":this.touchPoints[0].x, "y":this.touchPoints[0].y};
@@ -112,7 +113,7 @@ Item {
                 {
                     if(this.touchPoints[i].pressed)
                     {
-                        canvas.listLines[canvas.nLines].points.push({"x":this.touchPoints[i].x, "y":this.touchPoints[i].y});
+                        //canvas.listLines[canvas.nLines].points.push({"x":this.touchPoints[i].x, "y":this.touchPoints[i].y});
                         pointBuffer[i] = {"x":this.touchPoints[0].x, "y":this.touchPoints[0].y};
                     }
                     else
@@ -128,7 +129,7 @@ Item {
             {
                 // a new line is created only if the drawing is stopped
                 pointBuffer = [];
-                let isAllReleased = true
+                /*let isAllReleased = true
                 for(let i = 0; i < 5; ++i)
                 {
                     if(this.touchPoints[i].pressed)
@@ -141,7 +142,7 @@ Item {
                 {
                     canvas.isNeedNewLine = true;
                     ++canvas.nLines;
-                }
+                }*/
             }
 
             onTouchUpdated: {
@@ -149,7 +150,7 @@ Item {
                 {
                     if(this.touchPoints[i].pressed)
                     {
-                        canvas.listLines[canvas.nLines].points.push({"x":this.touchPoints[i].x, "y":this.touchPoints[i].y})
+                        //canvas.listLines[canvas.nLines].points.push({"x":this.touchPoints[i].x, "y":this.touchPoints[i].y})
                         pointBuffer[i] = {"x":this.touchPoints[i].x, "y":this.touchPoints[i].y};
                     }
                     else
@@ -215,8 +216,9 @@ Item {
 
             ctx.beginPath();
 
+            //console.log(ctx.canvas.save("B:\\QT\\imgs\\canvas.png") );
 
-            if(this.isRepaint)
+            /*if(this.isRepaint)
             {
                 ctx.reset();
                 isRepaint = false;
@@ -242,8 +244,11 @@ Item {
                     ctx.lineWidth = current_line.size;
                     ctx.strokeStyle  = current_line.color;
                 }
-            }
+            }*/
 
+
+            ctx.lineWidth = this.brushSize;
+            ctx.strokeStyle  = this.brushColor;
             for(let point = 0; point < area.pointBuffer.length; ++point)
             {
 

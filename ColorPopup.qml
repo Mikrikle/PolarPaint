@@ -48,7 +48,13 @@ Popup {
             }
 
 
-            RoundButton{}
+            RoundButton{
+                text: "<-"
+                onClicked: {
+                    h_slider.decrease();
+                    updateColor();
+                }
+            }
             Slider{
                 id: h_slider
                 Layout.fillWidth: true
@@ -61,7 +67,13 @@ Popup {
                 stepSize: 1
                 to: 360
             }
-            RoundButton{}
+            RoundButton{
+                text: "->"
+                onClicked: {
+                    h_slider.increase();
+                    updateColor();
+                }
+            }
 
         }
         RowLayout {
@@ -73,7 +85,13 @@ Popup {
                 }
                 width: 10
             }
-            RoundButton{}
+            RoundButton{
+                text: "<-"
+                onClicked: {
+                    s_slider.decrease();
+                    updateColor();
+                }
+            }
             Slider{
                 id: s_slider
                 Layout.fillWidth: true
@@ -86,8 +104,13 @@ Popup {
                 stepSize: 1
                 to: 100
             }
-            RoundButton{}
-
+            RoundButton{
+                text: "->"
+                onClicked: {
+                    s_slider.increase();
+                    updateColor();
+                }
+            }
         }
         RowLayout {
             width: parent.width
@@ -98,7 +121,13 @@ Popup {
                 }
                 width: 10
             }
-            RoundButton{}
+            RoundButton{
+                text: "<-"
+                onClicked: {
+                    l_slider.decrease();
+                    updateColor();
+                }
+            }
             Slider{
                 id: l_slider
                 Layout.fillWidth: true
@@ -111,7 +140,13 @@ Popup {
                 stepSize: 1
                 to: 100
             }
-            RoundButton{}
+            RoundButton{
+                text: "->"
+                onClicked: {
+                    l_slider.increase();
+                    updateColor();
+                }
+            }
 
         }
     }
