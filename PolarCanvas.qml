@@ -23,26 +23,18 @@ Item {
         property int brushSize: 1
         property string brushColor: "#55FF00"
         property string backgroundColor: "#202020"
-        var prev_cvs = null;
 
         /* system properties */
-        //property bool isRepaint: false
-        //property var line: {"points": [], "size":null, "color": null, "symmetry": false, "axes":1}
-        //property var listLines: []
-        //property var deletedLines: []
-        //property int nLines: 0
         property int bufX: 0
         property int bufY: 0
-        //property bool isNeedNewLine: true
+        property var prev_cvs: ({});
+        property var current_cvs: ({});
+        property bool isUndo: false;
+        property bool isRedo: false;
 
 
         function clear()
         {
-            //this.line =  {"points": [], "size":null, "color": null, "symmetry": false, "axes":1};
-            //this.listLines = [];
-            //this.deletedLines = [];
-            //this.nLines = 0;
-            //this.isNeedNewLine = true
             let ctx = getContext("2d");
             ctx.reset();
             this.requestPaint();
@@ -51,24 +43,14 @@ Item {
 
         function undo()
         {
-            /*if(this.listLines.length > 0)
-            {
-                this.deletedLines.unshift(this.listLines.pop());
-                --this.nLines;
-                this.isRepaint = true;
-                this.requestPaint();
-            }*/
+            isUndo = true;
+            clear();
         }
 
         function redo()
         {
-            /*if(this.deletedLines.length > 0)
-            {
-                this.listLines.push(this.deletedLines.shift());
-                ++this.nLines;
-                this.isRepaint = true;
-                this.requestPaint();
-            }*/
+            isRedo = true;
+            clear();
         }
 
         MultiPointTouchArea {
@@ -90,22 +72,13 @@ Item {
 
             onPressed: {
 
+                // save canvas
+                let ctx = canvas.getContext("2d");
+                canvas.prev_cvs = ctx.getImageData(0, 0, width, height);
+
                 // updating canvas
                 canvas.bufX = this.touchPoints[0].x;
                 canvas.bufY = this.touchPoints[0].y;
-                //canvas.deletedLines = [];
-
-                /*if(canvas.isNeedNewLine)
-                {
-                    // create new line obj
-                    canvas.listLines.push({"points": [], "size":null, "color": null });
-                    canvas.listLines[canvas.nLines].size = canvas.brushSize;
-                    canvas.listLines[canvas.nLines].color = canvas.brushColor;
-                    canvas.listLines[canvas.nLines].points = [{"x":this.touchPoints[0].x, "y":this.touchPoints[0].y}];
-                    canvas.listLines[canvas.nLines].symmetry = canvas.symmetry;
-                    canvas.listLines[canvas.nLines].axes = canvas.axes;
-                    canvas.isNeedNewLine = false;
-                }*/
 
                 // updating area
                 pointBuffer[0] = {"x":this.touchPoints[0].x, "y":this.touchPoints[0].y};
@@ -113,7 +86,6 @@ Item {
                 {
                     if(this.touchPoints[i].pressed)
                     {
-                        //canvas.listLines[canvas.nLines].points.push({"x":this.touchPoints[i].x, "y":this.touchPoints[i].y});
                         pointBuffer[i] = {"x":this.touchPoints[0].x, "y":this.touchPoints[0].y};
                     }
                     else
@@ -127,22 +99,11 @@ Item {
 
             onReleased:
             {
-                // a new line is created only if the drawing is stopped
+                // save canvas
+                let ctx = canvas.getContext("2d");
+                canvas.current_cvs = ctx.getImageData(0, 0, width, height);
+
                 pointBuffer = [];
-                /*let isAllReleased = true
-                for(let i = 0; i < 5; ++i)
-                {
-                    if(this.touchPoints[i].pressed)
-                    {
-                        isAllReleased = false;
-                        break;
-                    }
-                }
-                if(isAllReleased)
-                {
-                    canvas.isNeedNewLine = true;
-                    ++canvas.nLines;
-                }*/
             }
 
             onTouchUpdated: {
@@ -150,7 +111,6 @@ Item {
                 {
                     if(this.touchPoints[i].pressed)
                     {
-                        //canvas.listLines[canvas.nLines].points.push({"x":this.touchPoints[i].x, "y":this.touchPoints[i].y})
                         pointBuffer[i] = {"x":this.touchPoints[i].x, "y":this.touchPoints[i].y};
                     }
                     else
@@ -211,41 +171,25 @@ Item {
         }
 
         onPaint: {
+            if(isUndo)
+            {
+                let ctx = getContext("2d");
+                ctx.drawImage(prev_cvs, 0, 0);
+                isUndo = false;
+                return;
+            }
+
+            if(isRedo)
+            {
+                let ctx = getContext("2d");
+                ctx.drawImage(current_cvs, 0, 0);
+                isRedo = false;
+                return;
+            }
+
             let ctx = getContext("2d");
             ctx.lineCap = "round";
-
             ctx.beginPath();
-
-            //console.log(ctx.canvas.save("B:\\QT\\imgs\\canvas.png") );
-
-            /*if(this.isRepaint)
-            {
-                ctx.reset();
-                isRepaint = false;
-
-                for(let i = 0; i < nLines; ++i)
-                {
-                    let temp_line = this.listLines[i];
-                    ctx.lineWidth = temp_line.size;
-                    ctx.strokeStyle  = temp_line.color;
-                    for(let nPoint = 0; nPoint < temp_line.points.length - 1; ++nPoint)
-                    {
-                        let old_pos = getPolarCoords(temp_line.points[nPoint].x, temp_line.points[nPoint].y);
-                        let new_pos = getPolarCoords(temp_line.points[nPoint + 1].x, temp_line.points[nPoint + 1].y);
-                        draw(old_pos, new_pos, ctx, this.symmetry, this.axes);
-                    }
-                }
-            }
-            else
-            {
-                if(this.listLines.length > 0)
-                {
-                    let current_line = this.listLines[this.listLines.length - 1];
-                    ctx.lineWidth = current_line.size;
-                    ctx.strokeStyle  = current_line.color;
-                }
-            }*/
-
 
             ctx.lineWidth = this.brushSize;
             ctx.strokeStyle  = this.brushColor;
@@ -268,7 +212,6 @@ Item {
                     ctx.lineTo(this.bufX, this.bufY);
                 }
             }
-
             ctx.stroke();
         }
     }
