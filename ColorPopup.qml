@@ -35,7 +35,7 @@ Popup {
         x: 0
         y: parent.height - height
         Label {
-            text: "color"
+            text: qsTr("color")
         }
         RowLayout {
             width: parent.width
@@ -49,7 +49,8 @@ Popup {
 
 
             RoundButton{
-                text: "<-"
+                //text: "<-"
+                icon.source: "qrc:/images/arrow-back.png"
                 onClicked: {
                     h_slider.decrease();
                     updateColor();
@@ -68,7 +69,8 @@ Popup {
                 to: 360
             }
             RoundButton{
-                text: "->"
+                //text: "->"
+                icon.source: "qrc:/images/arrow-forward.png"
                 onClicked: {
                     h_slider.increase();
                     updateColor();
@@ -86,7 +88,8 @@ Popup {
                 width: 10
             }
             RoundButton{
-                text: "<-"
+                //text: "<-"
+                icon.source: "qrc:/images/arrow-back.png"
                 onClicked: {
                     s_slider.decrease();
                     updateColor();
@@ -105,7 +108,8 @@ Popup {
                 to: 100
             }
             RoundButton{
-                text: "->"
+                //text: "->"
+                icon.source: "qrc:/images/arrow-forward.png"
                 onClicked: {
                     s_slider.increase();
                     updateColor();
@@ -122,7 +126,8 @@ Popup {
                 width: 10
             }
             RoundButton{
-                text: "<-"
+                //text: "<-"
+                icon.source: "qrc:/images/arrow-back.png"
                 onClicked: {
                     l_slider.decrease();
                     updateColor();
@@ -141,7 +146,8 @@ Popup {
                 to: 100
             }
             RoundButton{
-                text: "->"
+                //text: "->"
+                icon.source: "qrc:/images/arrow-forward.png"
                 onClicked: {
                     l_slider.increase();
                     updateColor();

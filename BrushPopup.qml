@@ -18,12 +18,13 @@ Popup {
         x: 0
         y: parent.height - height
         Label {
-            text: "brush size: " + cvs.brushSize
+            text: qsTr("brush size: ") + cvs.brushSize
         }
         RowLayout {
             width: parent.width
             RoundButton{
-                text: "<-"
+                //text: "<-"
+                icon.source: "qrc:/images/arrow-back.png"
                 onClicked: {
                     brush_size_slider.decrease();
                     cvs.brushSize = brush_size_slider.value;
@@ -41,7 +42,8 @@ Popup {
                 }
             }
             RoundButton{
-                text: "->"
+                //text: "->"
+                icon.source: "qrc:/images/arrow-forward.png"
                 onClicked: {
                     brush_size_slider.increase();
                     cvs.brushSize = brush_size_slider.value;

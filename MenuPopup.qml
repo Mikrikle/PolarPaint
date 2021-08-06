@@ -49,31 +49,25 @@ Popup {
         id: view
 
         clip: true
-        currentIndex: 1
+        currentIndex: 0
         anchors.fill: parent
 
         Item {
             id: firstPage
             ColumnLayout {
-                Button{}
-                Button{}
-                Button{}
+                Button {
+                    text: qsTr("save")
+                }
             }
         }
         Item {
             id: secondPage
             ColumnLayout {
-                Button{}
-                Button{}
-                Button{}
-            }
-        }
-        Item {
-            id: thirdPage
-            ColumnLayout {
-                Button{}
-                Button{}
-                Button{}
+                Text  {
+                    color: "#FFFFFF"
+                    textFormat: Text.RichText
+                    text: "<h1>About</h1>"
+                }
             }
         }
     }

@@ -24,7 +24,7 @@ Popup {
 
 
             Label {
-                text: "symmetry: " + cvs.symmetry
+                text: qsTr("symmetry: ") + cvs.symmetry
             }
 
             Switch {
@@ -35,12 +35,13 @@ Popup {
         }
 
         Label {
-            text: "number of axes: " + cvs.axes
+            text: qsTr("number of axes: ") + cvs.axes
         }
         RowLayout {
             width: parent.width
             RoundButton{
-                text: "<-"
+                //text: "<-"
+                icon.source: "qrc:/images/arrow-back.png"
                 onClicked: {
                     axes_slider.decrease();
                     cvs.axes = axes_slider.value;
@@ -59,7 +60,8 @@ Popup {
                 }
             }
             RoundButton{
-                text: "->"
+                //text: "->"
+                icon.source: "qrc:/images/arrow-forward.png"
                 onClicked: {
                     axes_slider.increase();
                     cvs.axes = axes_slider.value;

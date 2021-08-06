@@ -32,7 +32,10 @@ Window {
                 PropertyChanges{
                     target: bottomMenu;
                     y: parent.height - bottomMenu.height
-
+                }
+                PropertyChanges{
+                    target: menuSwitch
+                    rotation: 0
                 }
             },
 
@@ -46,6 +49,10 @@ Window {
                     target: bottomMenu
                     y: parent.height
 
+                }
+                PropertyChanges{
+                    target: menuSwitch
+                    rotation: 180
                 }
             }
         ]
@@ -79,6 +86,7 @@ Window {
             Layout.alignment: Qt.AlignHCenter
             Material.accent: "#FF0000"
             text: "X"
+            icon.source: "qrc:/images/delete.png"
             delay: 400
             onActivated:
             {
@@ -93,7 +101,8 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            text: "<-"
+            //text: "<-"
+            icon.source: "qrc:/images/undo.png"
             onClicked: {
                 polarcanvas.canvas.undo();
             }
@@ -101,7 +110,8 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            text: "->"
+            //text: "->"
+            icon.source: "qrc:/images/redo.png"
             onClicked: {
                 polarcanvas.canvas.redo();
             }
@@ -112,7 +122,8 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            text: "Menu"
+            //text: qsTr("Menu")
+            icon.source: "qrc:/images/menu.png"
             onClicked: popup_menu.open()
             MenuPopup {
                 id: popup_menu
@@ -132,7 +143,8 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            text: "Draw"
+            //text: qsTr("Draw")
+            icon.source: "qrc:/images/tune.png"
             onClicked: {
                 popup_draw.visible = !popup_draw.visible
             }
@@ -145,7 +157,8 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            text: "Brush"
+            //text: qsTr("Brush")
+            icon.source: "qrc:/images/brush.png"
             onClicked: {
                 popup_brush.visible = !popup_brush.visible
             }
@@ -178,7 +191,8 @@ Window {
         anchors.bottom: bottomMenu.top
         anchors.right: parent.right
         id: menuSwitch
-        text: "<->"
+        //text: "<->"
+        icon.source: "qrc:/images/arrow.png"
 
         onClicked: {
             anim_menu.state = (anim_menu.state.toString() === "state_active") ? "state_disabled":"state_active";
