@@ -1,19 +1,48 @@
 #include "cCanvas.h"
 
 cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
-    , m_brushSize(1)
+    , m_brushSize(2)
     , m_brushColor("#55FF00")
     , m_symmetry(false)
-    , m_nAxes(5)
+    , m_nAxes(11)
+    , isMayUndo(false)
+    , isMayRedo(false)
 {
-    this->setWidth(2000);
-    this->setHeight(2000);
-    cvs = new QImage(width(), height(), QImage::Format_ARGB32);
+    auto r = QGuiApplication::screens().at(0)->availableSize();
+    cvs = new QImage(r.width(), r.height(), QImage::Format_ARGB32_Premultiplied);
 }
 
 cCanvas::~cCanvas()
 {
     delete cvs;
+}
+
+void cCanvas::redo()
+{
+    if(!canceled_cvs.isNull() && isMayRedo)
+    {
+        *cvs = canceled_cvs.copy();
+        update();
+        isMayRedo = false;
+        isMayUndo = true;
+    }
+}
+
+void cCanvas::undo()
+{
+    if(!prev_cvs.isNull() && isMayUndo)
+    {
+        canceled_cvs = cvs->copy();
+        *cvs = prev_cvs.copy();
+        update();
+        isMayUndo = false;
+        isMayRedo = true;
+    }
+}
+
+void cCanvas::memorizeCanvas()
+{
+    prev_cvs = cvs->copy();
 }
 
 QPointF cCanvas::getPolarCoords(QPoint coords)
@@ -29,13 +58,12 @@ QPointF cCanvas::getPolarCoords(QPoint coords)
 
 void cCanvas::draw(const QList<QPoint> &points)
 {
-
-    //QElapsedTimer timer;
-    //timer.start();
-
+    isMayUndo = true;
     QPainter painter(cvs);
-
+    painter.setRenderHint(QPainter::Antialiasing, true);
     auto pen = QPen(QColor(m_brushColor));
+    pen.setCapStyle(Qt::RoundCap);
+    pen.setJoinStyle(Qt::RoundJoin);
     pen.setWidth(m_brushSize);
 
     painter.setPen(pen);
@@ -72,9 +100,6 @@ void cCanvas::draw(const QList<QPoint> &points)
     }
 
     update();
-
-    //qDebug() << "The slow operation took" << timer.elapsed() << "milliseconds";
-
 }
 
 void cCanvas::clear()

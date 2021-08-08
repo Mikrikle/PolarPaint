@@ -25,7 +25,7 @@ Item {
     MirroredCanvas
     {
         id:canvas
-        anchors.centerIn: parent
+        anchors.fill: parent
 
         MultiPointTouchArea {
             id: area
@@ -47,8 +47,7 @@ Item {
             onPressed: {
 
                 // save canvas
-                // let ctx = canvas.getContext("2d");
-                // canvas.prev_cvs = ctx.getImageData(0, 0, width, height);
+                canvas.memorizeCanvas();
 
                 // updating canvas
                 canvas.bufPoint = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
@@ -71,11 +70,7 @@ Item {
 
             onReleased:
             {
-                // save canvas
-                // let ctx = canvas.getContext("2d");
-                // canvas.current_cvs = ctx.getImageData(0, 0, width, height);
-
-                //pointBuffer = [];
+                pointBuffer = [];
             }
 
             onTouchUpdated: {

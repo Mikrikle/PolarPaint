@@ -24,6 +24,10 @@ private:
     QPoint m_bufPoint;
 
     QImage *cvs;
+    QImage prev_cvs;
+    QImage canceled_cvs;
+    bool isMayUndo;
+    bool isMayRedo;
 
 public:
     cCanvas(QQuickItem *pqi = nullptr);
@@ -31,8 +35,10 @@ public:
 
     Q_INVOKABLE void draw(const QList<QPoint> &points);
     Q_INVOKABLE void clear();
-    Q_INVOKABLE void redo(){}
-    Q_INVOKABLE void undo(){}
+    Q_INVOKABLE void redo();
+    Q_INVOKABLE void undo();
+
+    Q_INVOKABLE void memorizeCanvas();
 
 
     void paint(QPainter *ppainter) override;
