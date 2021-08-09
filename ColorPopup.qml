@@ -24,10 +24,10 @@ Popup {
                 const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
                 return Math.round(255 * color).toString(16).padStart(2, '0');
             };
-            return `#${f(0)}${f(8)}${f(4)}`;
+            return `${f(0)}${f(8)}${f(4)}`;
         }
 
-        cvs.brushColor = hslToHex(h_slider.value, s_slider.value, l_slider.value);
+        cvs.brushColor = "#" + a_slider.value.toString(16) + hslToHex(h_slider.value, s_slider.value, l_slider.value);
     }
 
     ColumnLayout {
@@ -37,6 +37,50 @@ Popup {
         Label {
             text: qsTr("color")
         }
+
+        RowLayout {
+            width: parent.width
+            Item {
+                Label {
+                    anchors.centerIn: parent
+                    text: "a"
+                }
+                width: 10
+            }
+
+
+            RoundButton{
+                //text: "<-"
+                icon.source: "qrc:/images/arrow-back.png"
+                onClicked: {
+                    a_slider.decrease();
+                    updateColor();
+                }
+            }
+            Slider{
+                id: a_slider
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+                onMoved: {
+                    updateColor();
+                }
+                from: 17
+                value: 255
+                stepSize: 1
+                to: 255
+            }
+            RoundButton{
+                //text: "->"
+                icon.source: "qrc:/images/arrow-forward.png"
+                onClicked: {
+                    a_slider.increase();
+                    updateColor();
+                }
+            }
+
+        }
+
+
         RowLayout {
             width: parent.width
             Item {

@@ -2,9 +2,9 @@
 
 cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
     , m_brushSize(2)
-    , m_brushColor("#55FF00")
+    , m_brushColor("#FF55FF00")
     , m_symmetry(false)
-    , m_nAxes(11)
+    , m_nAxes(3)
     , isMayUndo(false)
     , isMayRedo(false)
 {

@@ -53,7 +53,7 @@ Popup {
                 Layout.alignment: Qt.AlignHCenter
                 from: 1
                 value: 3
-                to: 10000
+                to: 256
                 stepSize: 1
                 onMoved: {
                     cvs.axes = this.value;

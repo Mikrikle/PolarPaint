@@ -87,7 +87,7 @@ Window {
             Material.accent: "#FF0000"
             text: "X"
             icon.source: "qrc:/images/delete.png"
-            delay: 400
+            delay: 200
             onActivated:
             {
                 checked = false;
@@ -171,9 +171,10 @@ Window {
         Button {
             id: btn_color_indicator
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.alignment: Qt.AlignHCenter
-            highlighted: true
-            Material.accent: polarcanvas.canvas.brushColor
+            //highlighted: true
+            //Material.accent: polarcanvas.canvas.brushColor
             onClicked: {
                 popup_color.visible = !popup_color.visible
             }
@@ -181,6 +182,30 @@ Window {
                 id: popup_color
                 cvs: polarcanvas.canvas
             }
+            background: Rectangle {
+                implicitWidth: 50
+                Rectangle{
+                    anchors.fill: parent
+                    Repeater {
+                        model: [[0, 0,"#808080"], [parent.width/3, 0, "#C8C8C8"], [parent.width/3 * 2, 0, "#808080"],
+                            [0, parent.height/2, "#C8C8C8"], [parent.width/3, parent.height/2, "#808080"], [parent.width/3 * 2, parent.height/2, "#C8C8C8"]
+                        ]
+                        Rectangle {
+                            x: modelData[0]
+                            y: modelData[1]
+                            width: parent.width/3
+                            height: parent.height/2
+                            color: modelData[2]
+                        }
+                    }
+                }
+                Rectangle{
+                    anchors.fill: parent
+                    color: btn_color_indicator.down ? "#DEDEDE" : polarcanvas.canvas.brushColor
+                }
+            }
+
+
         }
 
         Item { width: 10 }
