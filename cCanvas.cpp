@@ -1,10 +1,10 @@
 #include "cCanvas.h"
 
 cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
-    , m_brushSize(2)
-    , m_brushColor("#FF55FF00")
-    , m_symmetry(false)
-    , m_nAxes(3)
+    , m_brushSize(jsSettings.getInt("brushSize"))
+    , m_brushColor(jsSettings.getString("brushColor"))
+    , m_symmetry(jsSettings.getBool("symmetry"))
+    , m_nAxes(jsSettings.getInt("nAxes"))
     , isMayUndo(false)
     , isMayRedo(false)
 {
@@ -14,6 +14,7 @@ cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
 
 cCanvas::~cCanvas()
 {
+    jsSettings.setData(m_brushSize, m_brushColor, m_symmetry, m_nAxes);
     delete cvs;
 }
 

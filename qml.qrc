@@ -6,5 +6,7 @@
         <file>BrushPopup.qml</file>
         <file>ColorPopup.qml</file>
         <file>DrawPopup.qml</file>
+        <file>SliderBtn.qml</file>
+        <file>BottomPopup.qml</file>
     </qresource>
 </RCC>

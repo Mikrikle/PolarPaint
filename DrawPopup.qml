@@ -2,16 +2,9 @@ import QtQuick 2.0
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
-Popup {
-    id: popup
-    property var cvs: null
-
-    parent: Overlay.overlay
-    focus: true
-    width: parent.width - 10;
-
-    x: Math.round((parent.width - width) / 2)
-    y: parent.height - height - bottomMenu.height
+BottomPopup {
+    property Item axes_slider: axes_slider
+    property bool isSymmetry: switch_symmetry.checked
 
     ColumnLayout {
         width: parent.width
@@ -22,63 +15,28 @@ Popup {
         RowLayout {
             width: parent.width
 
-
             Label {
-                text: qsTr("symmetry: ") + cvs.symmetry
+                text: qsTr("symmetry: ") + switch_symmetry.checked
+                Layout.alignment: Qt.AlignCenter
             }
 
             Switch {
-                onClicked: {
-                    cvs.symmetry = !cvs.symmetry
-                }
+                id: switch_symmetry
+                Layout.alignment: Qt.AlignCenter
             }
         }
 
         Label {
-            text: qsTr("number of axes: ") + cvs.axes
+            text: qsTr("number of axes: ") + axes_slider.value
         }
-        RowLayout {
-            width: parent.width
-            RoundButton{
-                //text: "<-"
-                icon.source: "qrc:/images/arrow-back.png"
-                onClicked: {
-                    axes_slider.decrease();
-                    cvs.axes = axes_slider.value;
-                }
-            }
-            Slider{
-                id: axes_slider
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter
-                from: 1
-                value: 3
-                to: 256
-                stepSize: 1
-                onMoved: {
-                    cvs.axes = this.value;
-                }
-            }
-            RoundButton{
-                //text: "->"
-                icon.source: "qrc:/images/arrow-forward.png"
-                onClicked: {
-                    axes_slider.increase();
-                    cvs.axes = axes_slider.value;
-                }
-            }
+
+        SliderBtn
+        {
+            id:axes_slider
+            from: 1
+            to: 256
+            stepSize: 1
+            value: 3
         }
     }
-
-    background: Rectangle {
-        color:"transparent"
-        Rectangle {
-            width: 1
-            anchors.fill: parent
-            radius: 10
-            color: "#414141"
-        }
-
-    }
-
 }

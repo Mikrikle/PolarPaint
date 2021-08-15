@@ -1,96 +1,73 @@
 import QtQuick 2.0
 import com.cpp.MirroredCanvas 1.0
 
-Item {
+MirroredCanvas
+{
+    id:canvas
+    anchors.fill: parent
 
-    property Item cvs : canvas
-    property Item bg : background
-
-    Rectangle {
-        id: background_rect
-        anchors.fill: canvas
-
-        Canvas {
-            id: background
-            anchors.fill: parent
-
-            onPaint: {
-                let ctx = getContext("2d");
-                ctx.fillStyle = "#202020";
-                ctx.fillRect(0, 0, width, height);
-            }
-        }
-    }
-
-    MirroredCanvas
-    {
-        id:canvas
+    MultiPointTouchArea {
+        id: area
         anchors.fill: parent
 
-        MultiPointTouchArea {
-            id: area
-            anchors.fill: parent
+        // points to draw at the moment
+        property var pointBuffer: []
 
-            // points to draw at the moment
-            property var pointBuffer: []
+        minimumTouchPoints: 1
+        maximumTouchPoints: 5
+        touchPoints: [
+            TouchPoint {},
+            TouchPoint {},
+            TouchPoint {},
+            TouchPoint {},
+            TouchPoint {}
+        ]
 
-            minimumTouchPoints: 1
-            maximumTouchPoints: 5
-            touchPoints: [
-                TouchPoint {},
-                TouchPoint {},
-                TouchPoint {},
-                TouchPoint {},
-                TouchPoint {}
-            ]
+        onPressed: {
 
-            onPressed: {
+            // save canvas
+            canvas.memorizeCanvas();
 
-                // save canvas
-                canvas.memorizeCanvas();
-
-                // updating canvas
-                canvas.bufPoint = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
-                // updating area
-                pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
-                for(let i = 1; i < 5; ++i)
-                {
-                    if(this.touchPoints[i].pressed)
-                    {
-                        pointBuffer[i] = Qt.point(this.touchPoints[i].x, this.touchPoints[i].y);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                canvas.draw(pointBuffer);
-            }
-
-            onReleased:
+            // updating canvas
+            canvas.bufPoint = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
+            // updating area
+            pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
+            for(let i = 1; i < 5; ++i)
             {
-                pointBuffer = [];
-            }
-
-            onTouchUpdated: {
-                for(let i = 0; i < 5; ++i)
+                if(this.touchPoints[i].pressed)
                 {
-                    if(this.touchPoints[i].pressed)
-                    {
-                        pointBuffer[i] = Qt.point(this.touchPoints[i].x, this.touchPoints[i].y);
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    pointBuffer[i] = Qt.point(this.touchPoints[i].x, this.touchPoints[i].y);
                 }
-                canvas.draw(pointBuffer);
+                else
+                {
+                    break;
+                }
             }
 
+            canvas.draw(pointBuffer);
+        }
+
+        onReleased:
+        {
+            pointBuffer = [];
+        }
+
+        onTouchUpdated: {
+            for(let i = 0; i < 5; ++i)
+            {
+                if(this.touchPoints[i].pressed)
+                {
+                    pointBuffer[i] = Qt.point(this.touchPoints[i].x, this.touchPoints[i].y);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            canvas.draw(pointBuffer);
         }
 
     }
-
-
 }
+
+

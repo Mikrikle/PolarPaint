@@ -8,10 +8,11 @@ CONFIG += c++11
 
 SOURCES += \
         cCanvas.cpp \
+        jsonEditor.cpp \
         main.cpp
 
 RESOURCES += qml.qrc \
-    images.qrc
+    resources.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

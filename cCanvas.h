@@ -4,8 +4,28 @@
 #include <QObject>
 #include <QtQuick>
 
+#include <QFile>
+#include <QJsonObject>
+#include <QJsonDocument>
+
 
 class QPainter;
+
+class jsonEditor
+{
+private:
+    QJsonObject json;
+    QString filename;
+
+public:
+    jsonEditor();
+
+    int getInt(const QString &key) const;
+    QString getString(const QString &key) const;
+    bool getBool(const QString &key) const;
+
+    void setData(int brushSize, const QString &brushColor, bool symmetry, int nAxes);
+};
 
 class cCanvas : public QQuickPaintedItem
 {
@@ -17,6 +37,8 @@ class cCanvas : public QQuickPaintedItem
     Q_PROPERTY(QPoint bufPoint WRITE setBufPoint READ getBufPoint)
 
 private:
+    jsonEditor jsSettings;
+
     int m_brushSize;
     QString m_brushColor;
     bool m_symmetry;

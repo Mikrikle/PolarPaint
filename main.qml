@@ -3,6 +3,7 @@ import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
 import Qt.labs.platform 1.1
 
+
 Window {
     id: main_window
     visible: true
@@ -13,10 +14,32 @@ Window {
     Material.theme: Material.Dark
     Material.accent: Material.Green
 
-    PolarCanvas {
-        id: polarcanvas
-        property Item canvas : cvs
+    Item {
         anchors.fill: parent
+        Rectangle {
+            id: background_rect
+            anchors.fill: canvas
+
+            Canvas {
+                id: background
+                anchors.fill: parent
+
+                onPaint: {
+                    let ctx = getContext("2d");
+                    ctx.fillStyle = "#202020";
+                    ctx.fillRect(0, 0, width, height);
+                }
+            }
+        }
+
+        PolarCanvas {
+            id: canvas
+            anchors.fill: parent
+            brushSize: popup_brush.slider.value
+            brushColor: popup_color.hexColor
+            symmetry: popup_draw.isSymmetry
+            axes: popup_draw.axes_slider.value
+        }
     }
 
     Item {
@@ -92,7 +115,7 @@ Window {
             {
                 checked = false;
                 progress = 0;
-                polarcanvas.canvas.clear();
+                canvas.clear();
             }
         }
 
@@ -101,19 +124,17 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            //text: "<-"
             icon.source: "qrc:/images/undo.png"
             onClicked: {
-                polarcanvas.canvas.undo();
+                canvas.undo();
             }
         }
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            //text: "->"
             icon.source: "qrc:/images/redo.png"
             onClicked: {
-                polarcanvas.canvas.redo();
+                canvas.redo();
             }
         }
 
@@ -122,7 +143,6 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            //text: qsTr("Menu")
             icon.source: "qrc:/images/menu.png"
             onClicked: popup_menu.open()
             MenuPopup {
@@ -143,28 +163,24 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            //text: qsTr("Draw")
             icon.source: "qrc:/images/tune.png"
             onClicked: {
                 popup_draw.visible = !popup_draw.visible
             }
             DrawPopup {
                 id: popup_draw
-                cvs: polarcanvas.canvas
             }
         }
 
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            //text: qsTr("Brush")
             icon.source: "qrc:/images/brush.png"
             onClicked: {
                 popup_brush.visible = !popup_brush.visible
             }
             BrushPopup {
                 id: popup_brush
-                cvs: polarcanvas.canvas
             }
         }
 
@@ -173,14 +189,11 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignHCenter
-            //highlighted: true
-            //Material.accent: polarcanvas.canvas.brushColor
             onClicked: {
                 popup_color.visible = !popup_color.visible
             }
             ColorPopup {
                 id: popup_color
-                cvs: polarcanvas.canvas
             }
             background: Rectangle {
                 implicitWidth: 50
@@ -201,8 +214,13 @@ Window {
                 }
                 Rectangle{
                     anchors.fill: parent
-                    color: btn_color_indicator.down ? "#DEDEDE" : polarcanvas.canvas.brushColor
+                    color: canvas.brushColor
+                    opacity: btn_color_indicator.down ? 0.5 : 1.0
+                    border.color: "#" + canvas.brushColor.slice(3)
+                    border.width: 3
                 }
+
+
             }
 
 
@@ -216,7 +234,6 @@ Window {
         anchors.bottom: bottomMenu.top
         anchors.right: parent.right
         id: menuSwitch
-        //text: "<->"
         icon.source: "qrc:/images/arrow.png"
 
         onClicked: {
