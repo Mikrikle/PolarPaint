@@ -1,4 +1,4 @@
-QT += qml quick core
+QT += svg xml qml quick core
 
 CONFIG += c++11
 
@@ -8,7 +8,6 @@ CONFIG += c++11
 
 SOURCES += \
         cCanvas.cpp \
-        jsonEditor.cpp \
         main.cpp
 
 RESOURCES += qml.qrc \

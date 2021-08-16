@@ -11,69 +11,62 @@
 
 class QPainter;
 
-class jsonEditor
-{
-private:
-    QJsonObject json;
-    QString filename;
-
-public:
-    jsonEditor();
-
-    int getInt(const QString &key) const;
-    QString getString(const QString &key) const;
-    bool getBool(const QString &key) const;
-
-    void setData(int brushSize, const QString &brushColor, bool symmetry, int nAxes);
-};
 
 class cCanvas : public QQuickPaintedItem
 {
     Q_OBJECT
     Q_PROPERTY(int brushSize MEMBER m_brushSize NOTIFY brushSizeChanged)
     Q_PROPERTY(QString brushColor MEMBER m_brushColor NOTIFY brushColorChanged)
-    Q_PROPERTY(bool symmetry MEMBER m_symmetry NOTIFY symmetryChanged)
+    Q_PROPERTY(bool symmetry MEMBER m_isSymmetry NOTIFY symmetryChanged)
     Q_PROPERTY(int axes MEMBER m_nAxes NOTIFY axesNumChanged)
-    Q_PROPERTY(QPoint bufPoint WRITE setBufPoint READ getBufPoint)
+    Q_PROPERTY(QPoint previousPoint MEMBER m_previuosPoint NOTIFY PreviousPointChanged)
 
 private:
-    jsonEditor jsSettings;
-
     int m_brushSize;
     QString m_brushColor;
-    bool m_symmetry;
+    bool m_isSymmetry;
     int m_nAxes;
-    QPoint m_bufPoint;
+    QPoint m_previuosPoint;
 
-    QImage *cvs;
-    QImage prev_cvs;
-    QImage canceled_cvs;
-    bool isMayUndo;
-    bool isMayRedo;
+    QImage *m_cvs;
 
+
+    QImage *m_savedCvs;
+    int m_maxNumSavedLines;
+    struct LineObj
+    {
+        QList<QList<QPoint>> path;
+        int size;
+        QString color;
+        int nAxes{0};
+        bool symmetry{false};
+    };
+    QList <LineObj> m_savedLines;
+    QStack <LineObj> m_undoLines;
+    void m_restoreCvs();
+    void m_drawLine(const LineObj &line, QImage *cvs, bool isPropertyBufferization);
+    void m_drawPoints(const QList<QPoint> &points, QImage *cvs);
+
+    QPointF m_getPolarCoords(QPoint coords);
 public:
     cCanvas(QQuickItem *pqi = nullptr);
     virtual ~cCanvas();
 
-    Q_INVOKABLE void draw(const QList<QPoint> &points);
     Q_INVOKABLE void clear();
     Q_INVOKABLE void redo();
     Q_INVOKABLE void undo();
 
-    Q_INVOKABLE void memorizeCanvas();
-
+    Q_INVOKABLE void startNewLine();
+    Q_INVOKABLE void continueLine(const QList<QPoint> &points);
 
     void paint(QPainter *ppainter) override;
-    QPointF getPolarCoords(QPoint coords);
-
-    QPoint getBufPoint() const {return m_bufPoint;}
-    void setBufPoint(const QPoint& point) {m_bufPoint = point;}
 
 signals:
     void brushSizeChanged(const int brushSize);
     void symmetryChanged(const bool symmetry);
     void axesNumChanged(const int nAxes);
     void brushColorChanged(const QString &color);
+    void PreviousPointChanged(const QPoint& point);
 };
 
 #endif // CCANVAS_H

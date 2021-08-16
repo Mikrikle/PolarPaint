@@ -11,7 +11,7 @@ RowLayout {
 
     width: parent.width
     RoundButton{
-        icon.source: "qrc:/images/arrow-back.png"
+        icon.source: "qrc:/images/arrow_left"
         onClicked: {
             slider.decrease();
         }
@@ -22,7 +22,7 @@ RowLayout {
         Layout.alignment: Qt.AlignHCenter
     }
     RoundButton{
-        icon.source: "qrc:/images/arrow-forward.png"
+        icon.source: "qrc:/images/arrow_right"
         onClicked: {
             slider.increase();
         }

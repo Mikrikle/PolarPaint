@@ -14,6 +14,7 @@ Window {
     Material.theme: Material.Dark
     Material.accent: Material.Green
 
+
     Item {
         anchors.fill: parent
         Rectangle {
@@ -108,8 +109,8 @@ Window {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
             Material.accent: "#FF0000"
-            text: "X"
-            icon.source: "qrc:/images/delete.png"
+            icon.width: 10
+            icon.height: 10
             delay: 200
             onActivated:
             {
@@ -117,6 +118,14 @@ Window {
                 progress = 0;
                 canvas.clear();
             }
+
+            Image {
+                anchors.centerIn: parent
+                height: 24
+                width: 24
+                source: "qrc:/images/delete"
+            }
+
         }
 
         Item { width: 10 }
@@ -124,7 +133,7 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            icon.source: "qrc:/images/undo.png"
+            icon.source: "qrc:/images/undo"
             onClicked: {
                 canvas.undo();
             }
@@ -132,7 +141,7 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            icon.source: "qrc:/images/redo.png"
+            icon.source: "qrc:/images/redo"
             onClicked: {
                 canvas.redo();
             }
@@ -143,7 +152,7 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            icon.source: "qrc:/images/menu.png"
+            icon.source: "qrc:/images/menu"
             onClicked: popup_menu.open()
             MenuPopup {
                 id: popup_menu
@@ -163,7 +172,7 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            icon.source: "qrc:/images/tune.png"
+            icon.source: "qrc:/images/tune"
             onClicked: {
                 popup_draw.visible = !popup_draw.visible
             }
@@ -175,7 +184,7 @@ Window {
         Button {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter
-            icon.source: "qrc:/images/brush.png"
+            icon.source: "qrc:/images/brush"
             onClicked: {
                 popup_brush.visible = !popup_brush.visible
             }
@@ -234,7 +243,7 @@ Window {
         anchors.bottom: bottomMenu.top
         anchors.right: parent.right
         id: menuSwitch
-        icon.source: "qrc:/images/arrow.png"
+        icon.source: "qrc:/images/expand"
 
         onClicked: {
             anim_menu.state = (anim_menu.state.toString() === "state_active") ? "state_disabled":"state_active";

@@ -26,10 +26,10 @@ MirroredCanvas
         onPressed: {
 
             // save canvas
-            canvas.memorizeCanvas();
+            canvas.startNewLine();
 
             // updating canvas
-            canvas.bufPoint = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
+            canvas.previousPoint = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
             // updating area
             pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
             for(let i = 1; i < 5; ++i)
@@ -44,7 +44,7 @@ MirroredCanvas
                 }
             }
 
-            canvas.draw(pointBuffer);
+            canvas.continueLine(pointBuffer);
         }
 
         onReleased:
@@ -64,7 +64,8 @@ MirroredCanvas
                     break;
                 }
             }
-            canvas.draw(pointBuffer);
+
+            canvas.continueLine(pointBuffer);
         }
 
     }

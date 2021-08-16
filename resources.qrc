@@ -1,13 +1,13 @@
 <RCC>
     <qresource prefix="/images">
-        <file alias="menu.png">images/baseline_list_white_48dp.png</file>
-        <file alias="brush.png">images/baseline_brush_white_48dp.png</file>
-        <file alias="delete.png">images/baseline_delete_outline_white_48dp.png</file>
-        <file alias="arrow.png">images/baseline_expand_more_white_48dp.png</file>
-        <file alias="redo.png">images/baseline_redo_white_48dp.png</file>
-        <file alias="tune.png">images/baseline_tune_white_48dp.png</file>
-        <file alias="undo.png">images/baseline_undo_white_48dp.png</file>
-        <file alias="arrow-forward.png">images/baseline_arrow_forward_white_48dp.png</file>
-        <file alias="arrow-back.png">images/baseline_arrow_back_white_48dp.png</file>
+        <file alias="arrow_left">images/arrow_back_white_48dp.svg</file>
+        <file alias="arrow_right">images/arrow_forward_white_48dp.svg</file>
+        <file alias="brush">images/brush_white_48dp.svg</file>
+        <file alias="delete">images/delete_white_48dp.svg</file>
+        <file alias="expand">images/expand_more_white_48dp.svg</file>
+        <file alias="menu">images/list_white_48dp.svg</file>
+        <file alias="redo">images/redo_white_48dp.svg</file>
+        <file alias="tune">images/tune_white_48dp.svg</file>
+        <file alias="undo">images/undo_white_48dp.svg</file>
     </qresource>
 </RCC>
