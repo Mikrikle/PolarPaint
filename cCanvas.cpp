@@ -20,10 +20,10 @@ cCanvas::~cCanvas()
 
 void cCanvas::redo()
 {
-    if(m_undoLines.length() > 0)
+    if(m_deletedLines.length() > 0)
     {
-        m_savedLines.push_back(m_undoLines.pop());
-        m_restoreCvs();
+        m_savedLines.push_back(m_deletedLines.pop());
+        m_redrawCvs();
     }
 }
 
@@ -31,24 +31,24 @@ void cCanvas::undo()
 {
     if(m_savedLines.length() > 0)
     {
-        m_undoLines.push(m_savedLines[m_savedLines.length() - 1]);
+        m_deletedLines.push(m_savedLines[m_savedLines.length() - 1]);
         m_savedLines.pop_back();
-        m_restoreCvs();
+        m_redrawCvs();
     }
 }
 
-void cCanvas::m_restoreCvs()
+void cCanvas::m_redrawCvs()
 {
     m_cvs->fill(Qt::transparent);
     *m_cvs = m_savedCvs->copy();
     for(auto& line : m_savedLines)
     {
-        m_drawLine(line, m_cvs, false);
+        m_drawLine(line, m_cvs);
     }
     update();
 }
 
-void cCanvas::m_drawLine(const LineObj &line, QImage *cvs, bool isPropertyBufferization)
+void cCanvas::m_drawLine(const LineObj &line, QImage *cvs)
 {
     auto saved_m_bufPoint = m_previuosPoint;
     auto saved_m_brushSize = m_brushSize;
@@ -66,22 +66,20 @@ void cCanvas::m_drawLine(const LineObj &line, QImage *cvs, bool isPropertyBuffer
         m_drawPoints(points, cvs);
     }
 
-    if(isPropertyBufferization)
-    {
-        m_previuosPoint = saved_m_bufPoint;
-        m_brushSize = saved_m_brushSize;;
-        m_brushColor = saved_m_brushColor;
-        m_isSymmetry = saved_m_isSymmetry;
-        m_nAxes = saved_m_nAxes;
-    }
+    m_previuosPoint = saved_m_bufPoint;
+    m_brushSize = saved_m_brushSize;;
+    m_brushColor = saved_m_brushColor;
+    m_isSymmetry = saved_m_isSymmetry;
+    m_nAxes = saved_m_nAxes;
+
 }
 
-void cCanvas::startNewLine()
+void cCanvas::startLine()
 {
-    m_undoLines.clear();
+    m_deletedLines.clear();
     if(m_savedLines.length() > m_maxNumSavedLines)
     {
-        m_drawLine(m_savedLines[0], m_savedCvs, true);
+        m_drawLine(m_savedLines[0], m_savedCvs);
         m_savedLines.pop_front();
     }
     LineObj line{{}, m_brushSize, m_brushColor, m_nAxes, m_isSymmetry};
@@ -120,21 +118,21 @@ void cCanvas::m_drawPoints(const QList<QPoint> &points, QImage *cvs)
     {
         if(m_nAxes > 1 || m_isSymmetry)
         {
-            QPointF old_pos = m_getPolarCoords(m_previuosPoint);
-            QPointF new_pos = m_getPolarCoords(point);
+            QPointF posFrom = m_getPolarCoords(m_previuosPoint);
+            QPointF posTo = m_getPolarCoords(point);
             for(int axis = 0; axis < m_nAxes; ++axis)
             {
-                QPoint start(width()/2 + cos(old_pos.y() + (angle * axis)) * old_pos.x(),
-                             height()/2 + sin(old_pos.y() + (angle * axis)) * old_pos.x());
-                QPoint end(width()/2 + cos(new_pos.y() + (angle * axis)) * new_pos.x(),
-                           height()/2 + sin(new_pos.y() + (angle * axis)) * new_pos.x());
+                QPoint start(width()/2 + cos(posFrom.y() + (angle * axis)) * posFrom.x(),
+                             height()/2 + sin(posFrom.y() + (angle * axis)) * posFrom.x());
+                QPoint end(width()/2 + cos(posTo.y() + (angle * axis)) * posTo.x(),
+                           height()/2 + sin(posTo.y() + (angle * axis)) * posTo.x());
                 painter.drawLine(start, end);
                 if(m_isSymmetry)
                 {
-                    QPoint start(width()/2 + cos((M_PI - old_pos.y() + (angle * axis))) * old_pos.x(),
-                                 height()/2 + sin((M_PI - old_pos.y() + (angle * axis))) * old_pos.x());
-                    QPoint end(width()/2 + cos((M_PI - new_pos.y() + (angle * axis))) * new_pos.x(),
-                               height()/2 + sin((M_PI - new_pos.y() + (angle * axis))) * new_pos.x());
+                    QPoint start(width()/2 + cos((M_PI - posFrom.y() + (angle * axis))) * posFrom.x(),
+                                 height()/2 + sin((M_PI - posFrom.y() + (angle * axis))) * posFrom.x());
+                    QPoint end(width()/2 + cos((M_PI - posTo.y() + (angle * axis))) * posTo.x(),
+                               height()/2 + sin((M_PI - posTo.y() + (angle * axis))) * posTo.x());
                     painter.drawLine(start, end);
                 }
             }
@@ -151,7 +149,7 @@ void cCanvas::m_drawPoints(const QList<QPoint> &points, QImage *cvs)
 
 void cCanvas::clear()
 {
-    m_undoLines.clear();
+    m_deletedLines.clear();
     m_savedLines.clear();
     m_cvs->fill(Qt::transparent);
     update();

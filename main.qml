@@ -14,7 +14,6 @@ Window {
     Material.theme: Material.Dark
     Material.accent: Material.Green
 
-
     Item {
         anchors.fill: parent
         Rectangle {

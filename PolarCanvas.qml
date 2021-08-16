@@ -24,12 +24,9 @@ MirroredCanvas
         ]
 
         onPressed: {
-
-            // save canvas
-            canvas.startNewLine();
-
-            // updating canvas
+            canvas.startLine();
             canvas.previousPoint = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
+
             // updating area
             pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
             for(let i = 1; i < 5; ++i)

@@ -22,15 +22,17 @@ class cCanvas : public QQuickPaintedItem
     Q_PROPERTY(QPoint previousPoint MEMBER m_previuosPoint NOTIFY PreviousPointChanged)
 
 private:
+    /* ---------PROPERTIES--------- */
     int m_brushSize;
     QString m_brushColor;
     bool m_isSymmetry;
     int m_nAxes;
     QPoint m_previuosPoint;
 
+    /* ---------MAIN CANVAS--------- */
     QImage *m_cvs;
 
-
+    /* ---------REDO UNDO--------- */
     QImage *m_savedCvs;
     int m_maxNumSavedLines;
     struct LineObj
@@ -42,11 +44,12 @@ private:
         bool symmetry{false};
     };
     QList <LineObj> m_savedLines;
-    QStack <LineObj> m_undoLines;
-    void m_restoreCvs();
-    void m_drawLine(const LineObj &line, QImage *cvs, bool isPropertyBufferization);
-    void m_drawPoints(const QList<QPoint> &points, QImage *cvs);
+    QStack <LineObj> m_deletedLines;
+    void m_redrawCvs();
 
+    /* ---------DRAWING--------- */
+    void m_drawLine(const LineObj &line, QImage *cvs);
+    void m_drawPoints(const QList<QPoint> &points, QImage *cvs);
     QPointF m_getPolarCoords(QPoint coords);
 public:
     cCanvas(QQuickItem *pqi = nullptr);
@@ -56,7 +59,7 @@ public:
     Q_INVOKABLE void redo();
     Q_INVOKABLE void undo();
 
-    Q_INVOKABLE void startNewLine();
+    Q_INVOKABLE void startLine();
     Q_INVOKABLE void continueLine(const QList<QPoint> &points);
 
     void paint(QPainter *ppainter) override;
