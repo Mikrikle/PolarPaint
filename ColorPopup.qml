@@ -6,6 +6,11 @@ import QtQuick.Layouts 1.12
 BottomPopup {
     property string hexColor: "#" + a_slider.value.toString(16) + hslToHex(h_slider.value, s_slider.value, l_slider.value);
 
+    property Item slider_aColor: a_slider
+    property Item slider_hColor: h_slider
+    property Item slider_sColor: s_slider
+    property Item slider_lColor: l_slider
+
     function hslToHex(h, s, l) {
         l /= 100;
         const a = s * Math.min(l, 1 - l) / 100;

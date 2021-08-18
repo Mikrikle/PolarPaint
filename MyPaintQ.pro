@@ -8,6 +8,7 @@ CONFIG += c++11
 
 SOURCES += \
         cCanvas.cpp \
+        jsonloader.cpp \
         main.cpp
 
 RESOURCES += qml.qrc \
@@ -25,7 +26,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    cCanvas.h
+    cCanvas.h \
+    jsonloader.h
 
 
 DISTFILES += \

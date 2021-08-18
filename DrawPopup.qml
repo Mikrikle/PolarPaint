@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.12
 
 BottomPopup {
     property Item axes_slider: axes_slider
-    property bool isSymmetry: switch_symmetry.checked
+    property alias isSymmetry: switch_symmetry.checked
 
     ColumnLayout {
         width: parent.width

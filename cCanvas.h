@@ -4,11 +4,6 @@
 #include <QObject>
 #include <QtQuick>
 
-#include <QFile>
-#include <QJsonObject>
-#include <QJsonDocument>
-
-
 class QPainter;
 
 
@@ -52,7 +47,7 @@ private:
     void m_drawPoints(const QList<QPoint> &points, QImage *cvs);
     QPointF m_getPolarCoords(QPoint coords);
 public:
-    cCanvas(QQuickItem *pqi = nullptr);
+    explicit cCanvas(QQuickItem *pqi = nullptr);
     virtual ~cCanvas();
 
     Q_INVOKABLE void clear();

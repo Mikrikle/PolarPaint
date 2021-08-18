@@ -3,6 +3,7 @@ import QtQuick.Controls.Material 2.12
 import QtQuick.Layouts 1.12
 import Qt.labs.platform 1.1
 
+import com.cpp.JsonSettings 1.0
 
 Window {
     id: main_window
@@ -13,6 +14,43 @@ Window {
 
     Material.theme: Material.Dark
     Material.accent: Material.Green
+
+
+    JsonSettings
+    {
+        id: settings
+
+        function getStrSettings()
+        {
+            let data = {
+                slider_brushSize: popup_brush.slider.value,
+                property_isSymmetry: popup_draw.isSymmetry,
+                slider_nAxes: popup_draw.axes_slider.value,
+                slider_aColor: popup_color.slider_aColor.value,
+                slider_hColor: popup_color.slider_hColor.value,
+                slider_sColor: popup_color.slider_sColor.value,
+                slider_lColor: popup_color.slider_lColor.value,
+            }
+            return JSON.stringify(data);
+        }
+
+        Component.onCompleted: {
+            let json = JSON.parse(settings.load("/settings.json"));
+            popup_brush.slider.value = json.slider_brushSize;
+            popup_draw.isSymmetry = json.property_isSymmetry;
+            popup_draw.axes_slider.value = json.slider_nAxes;
+            popup_color.slider_aColor.value = json.slider_aColor;
+            popup_color.slider_hColor.value = json.slider_hColor;
+            popup_color.slider_sColor.value = json.slider_sColor;
+            popup_color.slider_lColor.value = json.slider_lColor;
+
+        }
+
+        Component.onDestruction: {
+            settings.save(getStrSettings());
+        }
+
+    }
 
     Item {
         anchors.fill: parent
@@ -173,6 +211,7 @@ Window {
             Layout.alignment: Qt.AlignHCenter
             icon.source: "qrc:/images/tune"
             onClicked: {
+                settings.save(settings.getStrSettings());
                 popup_draw.visible = !popup_draw.visible
             }
             DrawPopup {
@@ -185,6 +224,7 @@ Window {
             Layout.alignment: Qt.AlignHCenter
             icon.source: "qrc:/images/brush"
             onClicked: {
+                settings.save(settings.getStrSettings());
                 popup_brush.visible = !popup_brush.visible
             }
             BrushPopup {
@@ -198,6 +238,7 @@ Window {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignHCenter
             onClicked: {
+                settings.save(settings.getStrSettings());
                 popup_color.visible = !popup_color.visible
             }
             ColorPopup {
@@ -227,11 +268,7 @@ Window {
                     border.color: "#" + canvas.brushColor.slice(3)
                     border.width: 3
                 }
-
-
             }
-
-
         }
 
         Item { width: 10 }
