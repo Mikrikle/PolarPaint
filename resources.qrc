@@ -9,5 +9,6 @@
         <file alias="redo">images/redo_white_48dp.svg</file>
         <file alias="tune">images/tune_white_48dp.svg</file>
         <file alias="undo">images/undo_white_48dp.svg</file>
+        <file alias="close">images/clear_white_48dp.svg</file>
     </qresource>
 </RCC>

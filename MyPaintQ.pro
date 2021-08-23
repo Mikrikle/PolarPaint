@@ -1,4 +1,4 @@
-QT += svg xml qml quick core
+QT += svg qml quick
 
 CONFIG += c++11
 

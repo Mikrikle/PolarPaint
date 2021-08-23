@@ -152,6 +152,7 @@ void cCanvas::clear()
     m_deletedLines.clear();
     m_savedLines.clear();
     m_cvs->fill(Qt::transparent);
+    m_savedCvs->fill(Qt::transparent);
     update();
 }
 

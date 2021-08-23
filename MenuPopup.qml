@@ -3,9 +3,8 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 Popup {
-
     id: popup
-    property var cvs: null
+    property Item canvas: null
 
     parent: Overlay.overlay
     closePolicy: Popup.NoAutoClose
@@ -84,7 +83,7 @@ Popup {
 
     RoundButton {
         anchors.right: parent.right
-        text: "X"
+        icon.source: "qrc:/images/close"
 
         onClicked: {
             popup.hide();
