@@ -44,6 +44,12 @@ Popup {
         }
     }
 
+    Dialog {
+        id: dialog_save
+        modal: true
+        standardButtons: Dialog.Ok
+    }
+
     SwipeView {
         id: view
 
@@ -56,6 +62,17 @@ Popup {
             ColumnLayout {
                 Button {
                     text: qsTr("save")
+                    onClicked: {
+                        if(canvas.save())
+                        {
+                            dialog_save.title = "Successfully saved";
+                        }
+                        else
+                        {
+                            dialog_save.title = "Error: unable to save";
+                        }
+                        dialog_save.open();
+                    }
                 }
             }
         }

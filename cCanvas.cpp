@@ -5,6 +5,7 @@ cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
     , m_brushColor("#FF00FF00")
     , m_isSymmetry(false)
     , m_nAxes(1)
+    , m_bgColor("#202020")
     , m_maxNumSavedLines(10)
 {
     auto r = QGuiApplication::screens().at(0)->availableSize();
@@ -146,6 +147,21 @@ void cCanvas::m_drawPoints(const QList<QPoint> &points, QImage *cvs)
 
     update();
 }
+
+
+Q_INVOKABLE bool cCanvas::save()
+{
+    QImage tmp(this->size().toSize(), m_cvs->format());
+    tmp.fill(QColor(m_bgColor));
+
+    QPainter painter(&tmp);
+    painter.drawImage(QPoint(0, 0), *m_cvs);
+
+    QString filename = "PolarPaint-" + QDate::currentDate().toString(Qt::ISODate) + QString("%1.png").arg(rand());
+    return tmp.save(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)
+                    + "/" + filename);
+}
+
 
 void cCanvas::clear()
 {

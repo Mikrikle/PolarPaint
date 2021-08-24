@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtQuick>
+#include <QDate>
 
 class QPainter;
 
@@ -15,6 +16,7 @@ class cCanvas : public QQuickPaintedItem
     Q_PROPERTY(bool symmetry MEMBER m_isSymmetry NOTIFY symmetryChanged)
     Q_PROPERTY(int axes MEMBER m_nAxes NOTIFY axesNumChanged)
     Q_PROPERTY(QPoint previousPoint MEMBER m_previuosPoint NOTIFY PreviousPointChanged)
+    Q_PROPERTY(QString bgColor MEMBER m_bgColor NOTIFY bgColorChanged)
 
 private:
     /* ---------PROPERTIES--------- */
@@ -23,6 +25,7 @@ private:
     bool m_isSymmetry;
     int m_nAxes;
     QPoint m_previuosPoint;
+    QString m_bgColor;
 
     /* ---------MAIN CANVAS--------- */
     QImage *m_cvs;
@@ -54,6 +57,8 @@ public:
     Q_INVOKABLE void redo();
     Q_INVOKABLE void undo();
 
+    Q_INVOKABLE bool save();
+
     Q_INVOKABLE void startLine();
     Q_INVOKABLE void continueLine(const QList<QPoint> &points);
 
@@ -65,6 +70,7 @@ signals:
     void axesNumChanged(const int nAxes);
     void brushColorChanged(const QString &color);
     void PreviousPointChanged(const QPoint& point);
+    void bgColorChanged(const QString &color);
 };
 
 #endif // CCANVAS_H

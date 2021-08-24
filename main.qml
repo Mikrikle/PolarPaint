@@ -64,7 +64,7 @@ Window {
 
                 onPaint: {
                     let ctx = getContext("2d");
-                    ctx.fillStyle = "#202020";
+                    ctx.fillStyle = canvas.bgColor;
                     ctx.fillRect(0, 0, width, height);
                 }
             }
@@ -193,6 +193,7 @@ Window {
             onClicked: popup_menu.open()
             MenuPopup {
                 id: popup_menu
+                canvas: canvas
             }
         }
 
