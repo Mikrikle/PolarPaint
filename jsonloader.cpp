@@ -52,6 +52,10 @@ QString JsonLoader::load(const QString &filename)
             recordObject.insert("slider_hColor", QJsonValue::fromVariant(100));
             recordObject.insert("slider_sColor", QJsonValue::fromVariant(100));
             recordObject.insert("slider_lColor", QJsonValue::fromVariant(50));
+            recordObject.insert("slider_BgAColor", QJsonValue::fromVariant(255));
+            recordObject.insert("slider_BgHColor", QJsonValue::fromVariant(0));
+            recordObject.insert("slider_BgSColor", QJsonValue::fromVariant(0));
+            recordObject.insert("slider_BgLColor", QJsonValue::fromVariant(10));
             QJsonDocument doc(recordObject);
             save(doc.toJson(QJsonDocument::Compact));
 

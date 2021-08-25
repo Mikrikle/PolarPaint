@@ -50,6 +50,17 @@ Popup {
         standardButtons: Dialog.Ok
     }
 
+    Popup {
+        width: parent.width - 10;
+        x: Math.round((parent.width - width) / 2)
+        y: parent.height - height - bottomMenu.height
+        id: popup_setBg
+        focus: true
+        CustomColorPicker {
+            id: bgColorPicker
+        }
+    }
+
     SwipeView {
         id: view
 
@@ -72,6 +83,13 @@ Popup {
                             dialog_save.title = "Error: unable to save";
                         }
                         dialog_save.open();
+                    }
+                }
+                Button {
+                    text: qsTr("Backround color")
+                    onClicked: {
+                        popup.close();
+                        popup_bgColor.open();
                     }
                 }
             }

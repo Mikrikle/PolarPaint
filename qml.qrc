@@ -8,5 +8,6 @@
         <file>DrawPopup.qml</file>
         <file>SliderBtn.qml</file>
         <file>BottomPopup.qml</file>
+        <file>CustomColorPicker.qml</file>
     </qresource>
 </RCC>

@@ -30,6 +30,11 @@ Window {
                 slider_hColor: popup_color.slider_hColor.value,
                 slider_sColor: popup_color.slider_sColor.value,
                 slider_lColor: popup_color.slider_lColor.value,
+                slider_BgAColor: bgColorPicker.a_slider.value,
+                slider_BgHColor: bgColorPicker.h_slider.value,
+                slider_BgSColor: bgColorPicker.s_slider.value,
+                slider_BgLColor: bgColorPicker.l_slider.value,
+
             }
             return JSON.stringify(data);
         }
@@ -43,7 +48,10 @@ Window {
             popup_color.slider_hColor.value = json.slider_hColor;
             popup_color.slider_sColor.value = json.slider_sColor;
             popup_color.slider_lColor.value = json.slider_lColor;
-
+            bgColorPicker.a_slider.value = json.slider_BgAColor;
+            bgColorPicker.h_slider.value = json.slider_BgHColor;
+            bgColorPicker.s_slider.value = json.slider_BgSColor;
+            bgColorPicker.l_slider.value = json.slider_BgLColor;
         }
 
         Component.onDestruction: {
@@ -55,19 +63,9 @@ Window {
     Item {
         anchors.fill: parent
         Rectangle {
-            id: background_rect
+            id: background
             anchors.fill: canvas
-
-            Canvas {
-                id: background
-                anchors.fill: parent
-
-                onPaint: {
-                    let ctx = getContext("2d");
-                    ctx.fillStyle = canvas.bgColor;
-                    ctx.fillRect(0, 0, width, height);
-                }
-            }
+            color: canvas.bgColor
         }
 
         PolarCanvas {
@@ -77,6 +75,7 @@ Window {
             brushColor: popup_color.hexColor
             symmetry: popup_draw.isSymmetry
             axes: popup_draw.axes_slider.value
+            bgColor: bgColorPicker.hexColor
         }
     }
 
@@ -194,6 +193,17 @@ Window {
             MenuPopup {
                 id: popup_menu
                 canvas: canvas
+
+                Popup {
+                    id: popup_bgColor
+                    width: parent.width - 10;
+                    x: Math.round((parent.width - width) / 2)
+                    y: parent.height - height - bottomMenu.height
+                    focus: true
+                    CustomColorPicker {
+                        id: bgColorPicker
+                    }
+                }
             }
         }
 

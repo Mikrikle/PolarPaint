@@ -157,7 +157,7 @@ Q_INVOKABLE bool cCanvas::save()
     QPainter painter(&tmp);
     painter.drawImage(QPoint(0, 0), *m_cvs);
 
-    QString filename = "PolarPaint-" + QDate::currentDate().toString(Qt::ISODate) + QString("%1.png").arg(rand());
+    QString filename = "PolarPaint-" + QDateTime::currentDateTime().toString("dd-MM-yy-hh-mm-ss-zzz") + ".png";
     return tmp.save(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)
                     + "/" + filename);
 }

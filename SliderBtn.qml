@@ -8,6 +8,7 @@ RowLayout {
     property alias to: slider.to
     property alias stepSize: slider.stepSize
     property alias value: slider.value
+    property alias background: slider.background
 
     width: parent.width
     RoundButton{
