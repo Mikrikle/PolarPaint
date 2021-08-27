@@ -10,7 +10,7 @@ ColumnLayout {
     property Item s_slider: s_slider
     property Item l_slider: l_slider
 
-    property var defaultValues: {'a':255, 'h':100,'s':100, 'l':50}
+    property var defaultValues: {'a':255, 'h':100,'s':0, 'l':0}
 
     width: parent.width
 
