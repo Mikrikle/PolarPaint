@@ -8,24 +8,26 @@ import com.cpp.JsonSettings 1.0
 Window {
     id: main_window
     visible: true
-    minimumWidth: 400
-    minimumHeight: 600
+    minimumWidth: 300
+    width: 400
+    minimumHeight: 400
+    height: 600
     title: qsTr("paint")
 
     Material.theme: Material.Dark
     Material.accent: Material.Green
 
-
+    /*---------SAVE AND RESTORE APP STATE----------*/
     JsonSettings
     {
         id: settings
 
-        function getStrSettings()
+        function getStrSettings() // create json with all items states
         {
             let data = {
                 slider_brushSize: popup_brush.slider.value,
                 property_isSymmetry: popup_draw.isSymmetry,
-                slider_nAxes: popup_draw.axes_slider.value,
+                slider_nAxes: popup_draw.slider_axes.value,
                 slider_aColor: popup_color.slider_aColor.value,
                 slider_hColor: popup_color.slider_hColor.value,
                 slider_sColor: popup_color.slider_sColor.value,
@@ -43,7 +45,7 @@ Window {
             let json = JSON.parse(settings.load("/settings.json"));
             popup_brush.slider.value = json.slider_brushSize;
             popup_draw.isSymmetry = json.property_isSymmetry;
-            popup_draw.axes_slider.value = json.slider_nAxes;
+            popup_draw.slider_axes.value = json.slider_nAxes;
             popup_color.slider_aColor.value = json.slider_aColor;
             popup_color.slider_hColor.value = json.slider_hColor;
             popup_color.slider_sColor.value = json.slider_sColor;
@@ -60,6 +62,71 @@ Window {
 
     }
 
+    /*---------ANIMATIONS OF EXPAND AND REDUCE----------*/
+    Item {
+        id: anim_interface_state_switcher
+        states: [
+            State{
+                name: "state_normal_interface"
+                PropertyChanges{
+                    target: menu_top
+                    y: 0
+                }
+                PropertyChanges{
+                    target: menu_bottom;
+                    y: parent.height - menu_bottom.height
+                }
+                PropertyChanges{
+                    target: btn_interface_states_switcher
+                    rotation: 0
+                }
+                PropertyChanges{
+                    target: menu_right
+                    scale: 1
+                }
+            },
+
+            State{
+                name: "state_minimal_interface"
+                PropertyChanges{
+                    target: menu_top
+                    y: -menu_top.height
+                }
+                PropertyChanges{
+                    target: menu_bottom
+                    y: parent.height
+
+                }
+                PropertyChanges{
+                    target: btn_interface_states_switcher
+                    rotation: 180
+                }
+                PropertyChanges{
+                    target: menu_right
+                    scale: 0.8
+                }
+            }
+        ]
+
+
+        transitions: [
+            Transition {
+                from: "*"
+                to: "*"
+                PropertyAnimation {
+                    targets: [menu_top, menu_bottom]
+                    properties: "y"
+                    easing.type: Easing.OutBack
+                    duration: 500
+                }
+
+            }
+        ]
+
+    }
+
+
+    /*---------MAIN CANVAS WITH BACKGROUND----------*/
     Item {
         anchors.fill: parent
         Rectangle {
@@ -74,70 +141,19 @@ Window {
             brushSize: popup_brush.slider.value
             brushColor: popup_color.hexColor
             symmetry: popup_draw.isSymmetry
-            axes: popup_draw.axes_slider.value
+            axes: popup_draw.slider_axes.value
             bgColor: bgColorPicker.hexColor
+            pixelRatio: Screen.devicePixelRatio
+            isSaveWithBg: popup_menu.isSaveWithBg;
         }
     }
 
-    Item {
-        id: anim_menu
-        states: [
-            State{
-                name: "state_active"
-                PropertyChanges{
-                    target: topMenu
-                    y: 0
 
-                }
-                PropertyChanges{
-                    target: bottomMenu;
-                    y: parent.height - bottomMenu.height
-                }
-                PropertyChanges{
-                    target: menuSwitch
-                    rotation: 0
-                }
-            },
-
-            State{
-                name: "state_disabled"
-                PropertyChanges{
-                    target: topMenu
-                    y: -topMenu.height
-                }
-                PropertyChanges{
-                    target: bottomMenu
-                    y: parent.height
-
-                }
-                PropertyChanges{
-                    target: menuSwitch
-                    rotation: 180
-                }
-            }
-        ]
-
-
-        transitions: [
-            Transition {
-                from: "*"
-                to: "*"
-                PropertyAnimation {
-                    targets: [topMenu, bottomMenu]
-                    properties: "y"
-                    easing.type: Easing.OutBack
-                    duration: 500
-                }
-
-            }
-        ]
-
-    }
-
+    /*---------TOP TOOLBAR (tools) ----------*/
     RowLayout {
-        id: topMenu
-        width: parent.width
-        x: 0
+        id: menu_top
+        width: parent.width > 600 ? 600 : parent.width
+        x: parent.width / 2 - this.width / 2
         y: 0
         Item { width: 10 }
 
@@ -198,10 +214,11 @@ Window {
                     id: popup_bgColor
                     width: parent.width - 10;
                     x: Math.round((parent.width - width) / 2)
-                    y: parent.height - height - bottomMenu.height
+                    y: parent.height - height - menu_bottom.height
                     focus: true
                     CustomColorPicker {
                         id: bgColorPicker
+                        isUseAlpha: false;
                     }
                 }
             }
@@ -210,10 +227,12 @@ Window {
         Item { width: 10 }
     }
 
+
+    /*---------BOTTOM TOOLBAR (setting up drawing) ----------*/
     RowLayout {
-        id: bottomMenu
-        width: parent.width
-        x: 0
+        id: menu_bottom
+        width: parent.width > 600 ? 600 : parent.width
+        x: parent.width / 2 - this.width / 2
         y: parent.height - height
         Item { width: 10 }
 
@@ -286,14 +305,105 @@ Window {
     }
 
 
+    /*---------RIGHT TOOLBAR (setting position and scale)----------*/
+    ColumnLayout
+    {
+        id: menu_right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        RoundButton {
+            scale: 0.75
+            icon.source: "qrc:/images/resize"
+            onClicked: {
+                canvas.scalingFactor = 1.0;
+                canvas.moveCenter();
+                canvas.moveMod = false;
+                canvas.update();
+            }
+        }
+
+        Label{
+            Layout.alignment: Qt.AlignCenter
+            text: Math.round(canvas.scalingFactor * 100) + "%"
+        }
+
+        RoundButton {
+            scale: 0.75
+            icon.source: "qrc:/images/plus"
+            onPressed: {
+                timer_decrease_scale.start();
+            }
+            onReleased: {
+                timer_decrease_scale.stop();
+            }
+            onClicked: {
+                if(canvas.scalingFactor <= 9.9)
+                    canvas.scalingFactor += 0.1;
+                canvas.update();
+            }
+        }
+
+        Timer {
+            id: timer_decrease_scale
+            repeat: true
+            interval: 50
+            onTriggered: {
+                if(canvas.scalingFactor <= 9.95)
+                    canvas.scalingFactor += 0.05;
+                else
+                    timer_decrease_scale.stop();
+                canvas.update();
+            }
+        }
+
+        RoundButton {
+            scale: 0.75
+            icon.source: "qrc:/images/minus"
+            onPressed: {
+                timer_increase_scale.start();
+            }
+            onReleased: {
+                timer_increase_scale.stop();
+            }
+            onClicked: {
+                if(canvas.scalingFactor > 0.1)
+                    canvas.scalingFactor -= 0.1;
+                canvas.update();
+            }
+        }
+
+        Timer {
+            id: timer_increase_scale
+            repeat: true
+            interval: 50
+            onTriggered: {
+                if(canvas.scalingFactor > 0.05)
+                    canvas.scalingFactor -= 0.05;
+                else
+                    timer_increase_scale.stop();
+                canvas.update();
+            }
+        }
+
+        RoundButton {
+            scale: 0.75
+            icon.source: "qrc:/images/move"
+            highlighted: canvas.moveMod
+            onClicked: {
+                canvas.moveMod = !canvas.moveMod;
+            }
+        }
+    }
+
+    /*---------EXPAND/REDUCE TOOLBARS----------*/
     RoundButton {
-        anchors.bottom: bottomMenu.top
+        anchors.bottom: menu_bottom.top
         anchors.right: parent.right
-        id: menuSwitch
+        id: btn_interface_states_switcher
         icon.source: "qrc:/images/expand"
 
         onClicked: {
-            anim_menu.state = (anim_menu.state.toString() === "state_active") ? "state_disabled":"state_active";
+            anim_interface_state_switcher.state = (anim_interface_state_switcher.state.toString() === "state_normal_interface") ? "state_minimal_interface":"state_normal_interface";
         }
     }
 }

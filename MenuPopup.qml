@@ -5,12 +5,13 @@ import QtQuick.Layouts 1.12
 Popup {
     id: popup
     property Item canvas: null
+    property alias isSaveWithBg: switch_is_save_with_bg.checked
 
     parent: Overlay.overlay
     closePolicy: Popup.NoAutoClose
     modal: true
     focus: true
-    width: parent.width - 100;
+    width: parent.width > 600 ? 500 : parent.width - 100
     height: parent.height - 100;
     x: Math.round((parent.width - width) / 2)
     y: Math.round((parent.height - height) / 2)
@@ -53,7 +54,7 @@ Popup {
     Popup {
         width: parent.width - 10;
         x: Math.round((parent.width - width) / 2)
-        y: parent.height - height - bottomMenu.height
+        y: parent.height - height - menu_bottom.height
         id: popup_setBg
         focus: true
         CustomColorPicker {
@@ -71,18 +72,19 @@ Popup {
         Item {
             id: firstPage
             ColumnLayout {
-                Button {
-                    text: qsTr("save")
-                    onClicked: {
-                        if(canvas.save())
-                        {
-                            dialog_save.title = "Successfully saved";
+                width: parent.width
+                Row {
+                    Button {
+                        text: qsTr("save")
+                        onClicked: {
+                            item_wait.visible = true;
+                            timer_save.start();
                         }
-                        else
-                        {
-                            dialog_save.title = "Error: unable to save";
-                        }
-                        dialog_save.open();
+                    }
+                    Switch {
+                        id: switch_is_save_with_bg
+                        text: qsTr("background")
+                        checked: true
                     }
                 }
                 Button {
@@ -92,6 +94,36 @@ Popup {
                         popup_bgColor.open();
                     }
                 }
+
+                Item{
+                    height: 10
+                }
+
+                Label{
+                    Layout.alignment: Qt.AlignCenter
+                    text: qsTr("screen size: ")
+                          + Math.round(main_window.width * Screen.devicePixelRatio)
+                          + "x"
+                          + Math.round(main_window.height * Screen.devicePixelRatio)
+                }
+                SliderBtn{
+                    id: slider_size
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignCenter
+                    from: 100
+                    to: 8000
+                    stepSize: 100
+                    value: 2000
+                    onValueChanged: {
+                        if(canvas)
+                            canvas.setCvsSize(this.value);
+                    }
+                }
+                Label{
+                    Layout.alignment: Qt.AlignCenter
+                    text: qsTr("canvas size: ") + slider_size.value + "x" + slider_size.value
+                }
+
             }
         }
         Item {
@@ -123,6 +155,47 @@ Popup {
         onClicked: {
             popup.hide();
         }
+    }
+
+    Timer{
+        id: timer_save
+        interval: 16
+        running: false
+        repeat: false
+        onTriggered: {
+            if(canvas.save())
+            {
+                dialog_save.title = "Successfully saved";
+            }
+            else
+            {
+                dialog_save.title = "Error: unable to save";
+            }
+            dialog_save.open();
+            item_wait.visible = false;
+        }
+    }
+
+    Item {
+        id: item_wait
+        visible: false
+        anchors.centerIn: parent
+
+        Rectangle{
+            anchors.centerIn: parent
+            width: 100
+            height: 100
+            color: "#000000"
+            radius: 20
+        }
+
+        Image {
+            anchors.centerIn: parent
+            height: 24
+            width: 24
+            source: "qrc:/images/wait"
+        }
+
     }
 
 }

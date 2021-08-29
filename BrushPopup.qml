@@ -3,18 +3,18 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 BottomPopup {
-    property Item slider: brush_size_slider
+    property Item slider: slider_brush_size
 
     ColumnLayout {
         width: parent.width
         x: 0
         y: parent.height - height
         Label {
-            text: qsTr("brush size: ") + brush_size_slider.value
+            text: qsTr("brush size: ") + slider_brush_size.value
         }
         SliderBtn
         {
-            id:brush_size_slider
+            id:slider_brush_size
             from: 1
             to: 100
             stepSize: 1

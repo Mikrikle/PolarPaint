@@ -10,6 +10,8 @@ ColumnLayout {
     property Item s_slider: s_slider
     property Item l_slider: l_slider
 
+    property bool isUseAlpha: true
+
     property var defaultValues: {'a':255, 'h':100,'s':0, 'l':0}
 
     width: parent.width
@@ -27,7 +29,7 @@ ColumnLayout {
 
     RowLayout {
         width: parent.width
-
+        visible: isUseAlpha
         Label {
             text: "a"
             Layout.alignment: Qt.AlignCenter

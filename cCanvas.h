@@ -17,6 +17,10 @@ class cCanvas : public QQuickPaintedItem
     Q_PROPERTY(int axes MEMBER m_nAxes NOTIFY axesNumChanged)
     Q_PROPERTY(QPoint previousPoint MEMBER m_previuosPoint NOTIFY PreviousPointChanged)
     Q_PROPERTY(QString bgColor MEMBER m_bgColor NOTIFY bgColorChanged)
+    Q_PROPERTY(double scalingFactor MEMBER m_scale NOTIFY scaleChanged)
+    Q_PROPERTY(bool moveMod MEMBER m_isMoveMod NOTIFY isMoveChanged)
+    Q_PROPERTY(double pixelRatio MEMBER m_PixelRatio NOTIFY pixelRatioChanged)
+    Q_PROPERTY(bool isSaveWithBg MEMBER m_isSaveBg NOTIFY isBgSaveChanged)
 
 private:
     /* ---------PROPERTIES--------- */
@@ -26,9 +30,15 @@ private:
     int m_nAxes;
     QPoint m_previuosPoint;
     QString m_bgColor;
+    double m_scale;
+    bool m_isMoveMod;
+    double m_PixelRatio;
+    bool m_isSaveBg;
 
     /* ---------MAIN CANVAS--------- */
     QImage *m_cvs;
+    int m_cvsSize;
+    QPoint m_offset;
 
     /* ---------REDO UNDO--------- */
     QImage *m_savedCvs;
@@ -49,6 +59,7 @@ private:
     void m_drawLine(const LineObj &line, QImage *cvs);
     void m_drawPoints(const QList<QPoint> &points, QImage *cvs);
     QPointF m_getPolarCoords(QPoint coords);
+
 public:
     explicit cCanvas(QQuickItem *pqi = nullptr);
     virtual ~cCanvas();
@@ -57,8 +68,13 @@ public:
     Q_INVOKABLE void redo();
     Q_INVOKABLE void undo();
 
+    Q_INVOKABLE void move(const QPoint& path);
+    Q_INVOKABLE void moveCenter();
+    Q_INVOKABLE void setCvsSize(const int size);
+
     Q_INVOKABLE bool save();
 
+    Q_INVOKABLE QPoint getCorrectPos(const QPoint& pos);
     Q_INVOKABLE void startLine();
     Q_INVOKABLE void continueLine(const QList<QPoint> &points);
 
@@ -71,6 +87,10 @@ signals:
     void brushColorChanged(const QString &color);
     void PreviousPointChanged(const QPoint& point);
     void bgColorChanged(const QString &color);
+    void scaleChanged(const double scale);
+    void isMoveChanged(bool x);
+    void pixelRatioChanged(const double ratio);
+    void isBgSaveChanged(bool x);
 };
 
 #endif // CCANVAS_H

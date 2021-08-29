@@ -6,11 +6,18 @@ cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
     , m_isSymmetry(false)
     , m_nAxes(1)
     , m_bgColor("#202020")
-    , m_maxNumSavedLines(10)
+    , m_scale(1.0)
+    , m_isMoveMod(false)
+    , m_PixelRatio(1)
+    , m_isSaveBg(true)
+    , m_cvsSize(2000)
+    , m_offset(0, 0)
+    , m_maxNumSavedLines(25)
 {
-    auto r = QGuiApplication::screens().at(0)->availableSize();
-    m_cvs = new QImage(r.width(), r.height(), QImage::Format_ARGB32_Premultiplied);
-    m_savedCvs = new QImage(r.width(), r.height(), QImage::Format_ARGB32_Premultiplied);
+    this->setSmooth(false);
+    m_cvs = new QImage(m_cvsSize, m_cvsSize, QImage::Format_ARGB32_Premultiplied);
+    m_savedCvs = new QImage(m_cvsSize, m_cvsSize, QImage::Format_ARGB32_Premultiplied);
+    clear();
 }
 
 cCanvas::~cCanvas()
@@ -95,8 +102,10 @@ void cCanvas::continueLine(const QList<QPoint> &points)
 
 QPointF cCanvas::m_getPolarCoords(QPoint coords)
 {
-    QVector2D pos(coords.x() - width() / 2, coords.y() - height() / 2);
+    QVector2D pos(coords.x() - m_cvsSize / 2, coords.y() - m_cvsSize / 2);
     float radius = pos.length();
+    if(radius <= 0)
+        return QPointF(0, 0);
     float f = atan(static_cast<float>(pos.y()) / pos.x());
     if (pos.x() < 0)
         f += M_PI;
@@ -123,17 +132,17 @@ void cCanvas::m_drawPoints(const QList<QPoint> &points, QImage *cvs)
             QPointF posTo = m_getPolarCoords(point);
             for(int axis = 0; axis < m_nAxes; ++axis)
             {
-                QPoint start(width()/2 + cos(posFrom.y() + (angle * axis)) * posFrom.x(),
-                             height()/2 + sin(posFrom.y() + (angle * axis)) * posFrom.x());
-                QPoint end(width()/2 + cos(posTo.y() + (angle * axis)) * posTo.x(),
-                           height()/2 + sin(posTo.y() + (angle * axis)) * posTo.x());
+                QPoint start(m_cvsSize/2 + cos(posFrom.y() + (angle * axis)) * posFrom.x(),
+                             m_cvsSize/2 + sin(posFrom.y() + (angle * axis)) * posFrom.x());
+                QPoint end(m_cvsSize/2 + cos(posTo.y() + (angle * axis)) * posTo.x(),
+                           m_cvsSize/2 + sin(posTo.y() + (angle * axis)) * posTo.x());
                 painter.drawLine(start, end);
                 if(m_isSymmetry)
                 {
-                    QPoint start(width()/2 + cos((M_PI - posFrom.y() + (angle * axis))) * posFrom.x(),
-                                 height()/2 + sin((M_PI - posFrom.y() + (angle * axis))) * posFrom.x());
-                    QPoint end(width()/2 + cos((M_PI - posTo.y() + (angle * axis))) * posTo.x(),
-                               height()/2 + sin((M_PI - posTo.y() + (angle * axis))) * posTo.x());
+                    QPoint start(m_cvsSize/2 + cos((M_PI - posFrom.y() + (angle * axis))) * posFrom.x(),
+                                 m_cvsSize/2 + sin((M_PI - posFrom.y() + (angle * axis))) * posFrom.x());
+                    QPoint end(m_cvsSize/2 + cos((M_PI - posTo.y() + (angle * axis))) * posTo.x(),
+                               m_cvsSize/2 + sin((M_PI - posTo.y() + (angle * axis))) * posTo.x());
                     painter.drawLine(start, end);
                 }
             }
@@ -151,15 +160,24 @@ void cCanvas::m_drawPoints(const QList<QPoint> &points, QImage *cvs)
 
 Q_INVOKABLE bool cCanvas::save()
 {
-    QImage tmp(this->size().toSize(), m_cvs->format());
-    tmp.fill(QColor(m_bgColor));
-
-    QPainter painter(&tmp);
-    painter.drawImage(QPoint(0, 0), *m_cvs);
 
     QString filename = "PolarPaint-" + QDateTime::currentDateTime().toString("dd-MM-yy-hh-mm-ss-zzz") + ".png";
-    return tmp.save(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)
-                    + "/" + filename);
+    QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)
+                   + "/" + filename;
+
+    if(m_isSaveBg)
+    {
+        QImage tmp(m_cvs->size(), m_cvs->format());
+        tmp.fill(QColor(m_bgColor));
+
+        QPainter painter(&tmp);
+        painter.drawImage(QPoint(0, 0), *m_cvs);
+        return tmp.save(path);
+    }
+    else
+    {
+        return m_cvs->save(path);
+    }
 }
 
 
@@ -172,8 +190,44 @@ void cCanvas::clear()
     update();
 }
 
-void cCanvas::paint(QPainter *ppainter)
+void cCanvas::move(const QPoint &path)
 {
-    ppainter->drawImage(QPoint(0, 0), *m_cvs);
+    m_offset += path;
 }
 
+void cCanvas::moveCenter()
+{
+    m_offset.setX(0);
+    m_offset.setY(0);
+}
+
+void cCanvas::setCvsSize(const int size)
+{
+    m_cvsSize = (size > 1?size:2);
+    *m_cvs = m_cvs->scaled(m_cvsSize, m_cvsSize);
+    *m_savedCvs = m_savedCvs->scaled(m_cvsSize, m_cvsSize);
+    update();
+}
+
+void cCanvas::paint(QPainter *ppainter)
+{
+    QRect imgRect(
+        width() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)) + m_offset.x(),
+        height() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)) + m_offset.y(),
+        m_cvsSize * (m_scale / m_PixelRatio),
+        m_cvsSize * (m_scale / m_PixelRatio)
+    );
+    ppainter->setPen(QPen(Qt::black, 2));
+    ppainter->drawRect(imgRect);
+    ppainter->setPen(QPen(Qt::white, 1));
+    ppainter->drawRect(imgRect);
+    ppainter->drawImage(imgRect,*m_cvs);
+}
+
+QPoint cCanvas::getCorrectPos(const QPoint& pos)
+{
+    return QPoint(
+        ((pos.x() - m_offset.x() - (width() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)))) / (m_scale / m_PixelRatio)),
+        ((pos.y() - m_offset.y() - (height() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)))) / (m_scale / m_PixelRatio))
+    );
+}

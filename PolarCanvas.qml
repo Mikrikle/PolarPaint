@@ -10,8 +10,8 @@ MirroredCanvas
         id: area
         anchors.fill: parent
 
-        // points to draw at the moment
         property var pointBuffer: []
+        property var prevPos: ({})
 
         minimumTouchPoints: 1
         maximumTouchPoints: 5
@@ -24,24 +24,31 @@ MirroredCanvas
         ]
 
         onPressed: {
-            canvas.startLine();
-            canvas.previousPoint = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
-
-            // updating area
-            pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y);
-            for(let i = 1; i < 5; ++i)
+            if(!canvas.moveMod)
             {
-                if(this.touchPoints[i].pressed)
-                {
-                    pointBuffer[i] = Qt.point(this.touchPoints[i].x, this.touchPoints[i].y);
-                }
-                else
-                {
-                    break;
-                }
-            }
+                canvas.startLine();
+                canvas.previousPoint = canvas.getCorrectPos(Qt.point(this.touchPoints[0].x, this.touchPoints[0].y));
 
-            canvas.continueLine(pointBuffer);
+                pointBuffer[0] = canvas.getCorrectPos(Qt.point(this.touchPoints[0].x, this.touchPoints[0].y));
+                for(let i = 1; i < 5; ++i)
+                {
+                    if(this.touchPoints[i].pressed)
+                    {
+                        pointBuffer[i] = canvas.getCorrectPos(Qt.point(this.touchPoints[i].x, this.touchPoints[i].y));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                canvas.continueLine(pointBuffer);
+            }
+            else
+            {
+                pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y)
+                prevPos = this.pointBuffer[0];
+            }
         }
 
         onReleased:
@@ -50,19 +57,29 @@ MirroredCanvas
         }
 
         onTouchUpdated: {
-            for(let i = 0; i < 5; ++i)
+            if(!canvas.moveMod)
             {
-                if(this.touchPoints[i].pressed)
+                for(let i = 0; i < 5; ++i)
                 {
-                    pointBuffer[i] = Qt.point(this.touchPoints[i].x, this.touchPoints[i].y);
+                    if(this.touchPoints[i].pressed)
+                    {
+                        pointBuffer[i] = canvas.getCorrectPos(Qt.point(this.touchPoints[i].x, this.touchPoints[i].y));
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                else
-                {
-                    break;
-                }
-            }
 
-            canvas.continueLine(pointBuffer);
+                canvas.continueLine(pointBuffer);
+            }
+            else
+            {
+                pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y)
+                canvas.move(Qt.point(this.pointBuffer[0].x - prevPos.x, this.pointBuffer[0].y - prevPos.y));
+                canvas.update();
+                prevPos = pointBuffer[0];
+            }
         }
 
     }

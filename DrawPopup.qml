@@ -3,7 +3,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 BottomPopup {
-    property Item axes_slider: axes_slider
+    property Item slider_axes: slider_axes
     property alias isSymmetry: switch_symmetry.checked
 
     ColumnLayout {
@@ -27,12 +27,12 @@ BottomPopup {
         }
 
         Label {
-            text: qsTr("number of axes: ") + axes_slider.value
+            text: qsTr("number of axes: ") + slider_axes.value
         }
 
         SliderBtn
         {
-            id:axes_slider
+            id:slider_axes
             from: 1
             to: 256
             stepSize: 1

@@ -10,5 +10,10 @@
         <file alias="tune">images/tune_white_48dp.svg</file>
         <file alias="undo">images/undo_white_48dp.svg</file>
         <file alias="close">images/clear_white_48dp.svg</file>
+        <file alias="resize">images/aspect_ratio_white_48dp.svg</file>
+        <file alias="move">images/control_camera_white_48dp.svg</file>
+        <file alias="plus">images/add_white_48dp.svg</file>
+        <file alias="minus">images/remove_white_48dp.svg</file>
+        <file alias="wait">images/hourglass_bottom_white_48dp.svg</file>
     </qresource>
 </RCC>
