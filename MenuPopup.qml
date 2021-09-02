@@ -69,8 +69,9 @@ Popup {
         currentIndex: 0
         anchors.fill: parent
 
-        Item {
+        ScrollView {
             id: firstPage
+
             ColumnLayout {
                 width: parent.width
                 Row {
@@ -108,7 +109,7 @@ Popup {
                 }
                 SliderBtn{
                     id: slider_size
-                    Layout.fillWidth: true
+                    implicitWidth: firstPage.width - 110
                     Layout.alignment: Qt.AlignCenter
                     from: 100
                     to: 8000
@@ -123,7 +124,6 @@ Popup {
                     Layout.alignment: Qt.AlignCenter
                     text: qsTr("canvas size: ") + slider_size.value + "x" + slider_size.value
                 }
-
             }
         }
         Item {
@@ -144,7 +144,7 @@ Popup {
         count: view.count
         currentIndex: view.currentIndex
 
-        anchors.bottom: view.bottom
+        anchors.top: view.bottom
         anchors.horizontalCenter: parent.horizontalCenter
     }
 

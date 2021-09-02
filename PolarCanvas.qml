@@ -81,7 +81,6 @@ MirroredCanvas
                 prevPos = pointBuffer[0];
             }
         }
-
     }
 }
 

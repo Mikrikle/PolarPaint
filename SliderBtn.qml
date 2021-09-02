@@ -9,8 +9,8 @@ RowLayout {
     property alias stepSize: slider.stepSize
     property alias value: slider.value
     property alias background: slider.background
+    property alias implicitWidth: slider.implicitWidth
 
-    width: parent.width
     RoundButton{
         icon.source: "qrc:/images/arrow_left"
         onClicked: {

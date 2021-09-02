@@ -10,7 +10,7 @@ Window {
     visible: true
     minimumWidth: 300
     width: 400
-    minimumHeight: 400
+    minimumHeight: 300
     height: 600
     title: qsTr("paint")
 
