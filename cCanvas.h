@@ -21,6 +21,7 @@ class cCanvas : public QQuickPaintedItem
     Q_PROPERTY(bool moveMod MEMBER m_isMoveMod NOTIFY isMoveChanged)
     Q_PROPERTY(double pixelRatio MEMBER m_PixelRatio NOTIFY pixelRatioChanged)
     Q_PROPERTY(bool isSaveWithBg MEMBER m_isSaveBg NOTIFY isBgSaveChanged)
+    Q_PROPERTY(bool isDrawCenterPoint MEMBER m_isDrawCenterPoint NOTIFY isDrawCenterChanged)
 
 private:
     /* ---------PROPERTIES--------- */
@@ -34,6 +35,7 @@ private:
     bool m_isMoveMod;
     double m_PixelRatio;
     bool m_isSaveBg;
+    bool m_isDrawCenterPoint;
 
     /* ---------MAIN CANVAS--------- */
     QImage *m_cvs;
@@ -70,6 +72,7 @@ public:
 
     Q_INVOKABLE void move(const QPoint& path);
     Q_INVOKABLE void moveCenter();
+    Q_INVOKABLE void changeScaleWithCentering(double scaleChange);
     Q_INVOKABLE void setCvsSize(const int size);
 
     Q_INVOKABLE bool save();
@@ -81,16 +84,17 @@ public:
     void paint(QPainter *ppainter) override;
 
 signals:
-    void brushSizeChanged(const int brushSize);
-    void symmetryChanged(const bool symmetry);
-    void axesNumChanged(const int nAxes);
+    void brushSizeChanged(int brushSize);
+    void symmetryChanged(bool symmetry);
+    void axesNumChanged(int nAxes);
     void brushColorChanged(const QString &color);
     void PreviousPointChanged(const QPoint& point);
     void bgColorChanged(const QString &color);
-    void scaleChanged(const double scale);
+    void scaleChanged(double scale);
     void isMoveChanged(bool x);
-    void pixelRatioChanged(const double ratio);
+    void pixelRatioChanged(double ratio);
     void isBgSaveChanged(bool x);
+    void isDrawCenterChanged(bool x);
 };
 
 #endif // CCANVAS_H

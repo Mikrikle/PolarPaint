@@ -6,6 +6,7 @@ Popup {
     id: popup
     property Item canvas: null
     property alias isSaveWithBg: switch_is_save_with_bg.checked
+    property alias isDrawCenterPoint: switch_is_draw_center.checked
 
     parent: Overlay.overlay
     closePolicy: Popup.NoAutoClose
@@ -74,6 +75,18 @@ Popup {
 
             ColumnLayout {
                 width: parent.width
+
+
+                Button {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignHCenter
+                    icon.source: "qrc:/images/close"
+
+                    onClicked: {
+                        popup.hide();
+                    }
+                }
+
                 Row {
                     Button {
                         text: qsTr("save")
@@ -124,6 +137,15 @@ Popup {
                     Layout.alignment: Qt.AlignCenter
                     text: qsTr("canvas size: ") + slider_size.value + "x" + slider_size.value
                 }
+
+                Switch {
+                    id: switch_is_draw_center
+                    text: qsTr("draw point at center")
+                    checked: true
+                    onCheckedChanged: {
+                        canvas.update();
+                    }
+                }
             }
         }
         Item {
@@ -146,15 +168,6 @@ Popup {
 
         anchors.top: view.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-    }
-
-    RoundButton {
-        anchors.right: parent.right
-        icon.source: "qrc:/images/close"
-
-        onClicked: {
-            popup.hide();
-        }
     }
 
     Timer{

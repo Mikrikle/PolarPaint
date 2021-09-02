@@ -145,6 +145,7 @@ Window {
             bgColor: bgColorPicker.hexColor
             pixelRatio: Screen.devicePixelRatio
             isSaveWithBg: popup_menu.isSaveWithBg;
+            isDrawCenterPoint: popup_menu.isDrawCenterPoint
         }
     }
 
@@ -319,6 +320,8 @@ Window {
                 canvas.moveCenter();
                 canvas.moveMod = false;
                 canvas.update();
+                timer_increase_scale.stop();
+                timer_decrease_scale.stop();
             }
         }
 
@@ -328,6 +331,7 @@ Window {
         }
 
         RoundButton {
+            id: btn_increase_scale
             scale: 0.75
             icon.source: "qrc:/images/plus"
             onPressed: {
@@ -338,7 +342,7 @@ Window {
             }
             onClicked: {
                 if(canvas.scalingFactor <= 9.9)
-                    canvas.scalingFactor += 0.1;
+                    canvas.changeScaleWithCentering(0.1);
                 canvas.update();
             }
         }
@@ -346,10 +350,10 @@ Window {
         Timer {
             id: timer_decrease_scale
             repeat: true
-            interval: 50
+            interval: 10
             onTriggered: {
-                if(canvas.scalingFactor <= 9.95)
-                    canvas.scalingFactor += 0.05;
+                if(canvas.scalingFactor <= 9.95 && btn_increase_scale.down)
+                    canvas.changeScaleWithCentering(0.01);
                 else
                     timer_decrease_scale.stop();
                 canvas.update();
@@ -357,6 +361,7 @@ Window {
         }
 
         RoundButton {
+            id: btn_decrease_scale
             scale: 0.75
             icon.source: "qrc:/images/minus"
             onPressed: {
@@ -367,7 +372,7 @@ Window {
             }
             onClicked: {
                 if(canvas.scalingFactor > 0.1)
-                    canvas.scalingFactor -= 0.1;
+                    canvas.changeScaleWithCentering(-0.1);
                 canvas.update();
             }
         }
@@ -375,10 +380,10 @@ Window {
         Timer {
             id: timer_increase_scale
             repeat: true
-            interval: 50
+            interval: 10
             onTriggered: {
-                if(canvas.scalingFactor > 0.05)
-                    canvas.scalingFactor -= 0.05;
+                if(canvas.scalingFactor > 0.05 && btn_decrease_scale.down)
+                   canvas.changeScaleWithCentering(-0.01);
                 else
                     timer_increase_scale.stop();
                 canvas.update();
@@ -391,6 +396,8 @@ Window {
             highlighted: canvas.moveMod
             onClicked: {
                 canvas.moveMod = !canvas.moveMod;
+                timer_increase_scale.stop();
+                timer_decrease_scale.stop();
             }
         }
     }

@@ -10,6 +10,7 @@ cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
     , m_isMoveMod(false)
     , m_PixelRatio(1)
     , m_isSaveBg(true)
+    , m_isDrawCenterPoint(true)
     , m_cvsSize(2000)
     , m_offset(0, 0)
     , m_maxNumSavedLines(25)
@@ -216,12 +217,18 @@ void cCanvas::paint(QPainter *ppainter)
         height() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)) + m_offset.y(),
         m_cvsSize * (m_scale / m_PixelRatio),
         m_cvsSize * (m_scale / m_PixelRatio)
-    );
+        );
     ppainter->setPen(QPen(Qt::black, 2));
     ppainter->drawRect(imgRect);
     ppainter->setPen(QPen(Qt::white, 1));
     ppainter->drawRect(imgRect);
     ppainter->drawImage(imgRect,*m_cvs);
+
+    if(m_isDrawCenterPoint)
+    {
+        ppainter->setPen(QPen(Qt::white, 1));
+        ppainter->drawPoint(width() / 2, height() / 2);
+    }
 }
 
 QPoint cCanvas::getCorrectPos(const QPoint& pos)
@@ -229,5 +236,16 @@ QPoint cCanvas::getCorrectPos(const QPoint& pos)
     return QPoint(
         ((pos.x() - m_offset.x() - (width() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)))) / (m_scale / m_PixelRatio)),
         ((pos.y() - m_offset.y() - (height() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)))) / (m_scale / m_PixelRatio))
-    );
+        );
+}
+
+
+void cCanvas::changeScaleWithCentering(double scaleChange)
+{
+    QPoint corret_center(getCorrectPos(QPoint(width() / 2, height() / 2)));
+    m_scale += scaleChange;
+    emit scaleChanged(m_scale);
+    move(QPoint((m_cvsSize / 2 - corret_center.x()) / (1 / scaleChange),
+                (m_cvsSize / 2 - corret_center.y()) / (1 / scaleChange))
+         );
 }
