@@ -12,7 +12,7 @@ Popup {
     closePolicy: Popup.NoAutoClose
     modal: true
     focus: true
-    width: parent.width > 600 ? 500 : parent.width - 100
+    width: parent.width > 600 ? 500 : (parent.width>400?parent.width-100:parent.width-10)
     height: parent.height - 100;
     x: Math.round((parent.width - width) / 2)
     y: Math.round((parent.height - height) / 2)
@@ -67,52 +67,13 @@ Popup {
         id: view
 
         clip: true
-        currentIndex: 0
+        currentIndex: 1
         anchors.fill: parent
 
-        ScrollView {
+        Item {
             id: firstPage
-
             ColumnLayout {
                 width: parent.width
-
-
-                Button {
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignHCenter
-                    icon.source: "qrc:/images/close"
-
-                    onClicked: {
-                        popup.hide();
-                    }
-                }
-
-                Row {
-                    Button {
-                        text: qsTr("save")
-                        onClicked: {
-                            item_wait.visible = true;
-                            timer_save.start();
-                        }
-                    }
-                    Switch {
-                        id: switch_is_save_with_bg
-                        text: qsTr("background")
-                        checked: true
-                    }
-                }
-                Button {
-                    text: qsTr("Backround color")
-                    onClicked: {
-                        popup.close();
-                        popup_bgColor.open();
-                    }
-                }
-
-                Item{
-                    height: 10
-                }
-
                 Label{
                     Layout.alignment: Qt.AlignCenter
                     text: qsTr("screen size: ")
@@ -148,8 +109,48 @@ Popup {
                 }
             }
         }
+
         Item {
             id: secondPage
+
+            ColumnLayout {
+                width: parent.width
+
+                Button {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignHCenter
+                    icon.source: "qrc:/images/close"
+
+                    onClicked: {
+                        popup.hide();
+                    }
+                }
+
+                Row {
+                    Button {
+                        text: qsTr("save")
+                        onClicked: {
+                            item_wait.visible = true;
+                            timer_save.start();
+                        }
+                    }
+                    Switch {
+                        id: switch_is_save_with_bg
+                        text: qsTr("background")
+                        checked: true
+                    }
+                }
+                Button {
+                    text: qsTr("Backround color")
+                    onClicked: {
+                        popup.close();
+                        popup_bgColor.open();
+                    }
+                }
+            }
+        }
+        Item {
+            id: thirdPage
             ColumnLayout {
                 Text  {
                     color: "#FFFFFF"
