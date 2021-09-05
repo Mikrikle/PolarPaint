@@ -319,6 +319,7 @@ Window {
                 canvas.scalingFactor = 1.0;
                 canvas.moveCenter();
                 canvas.moveMod = false;
+                canvas.setTempCenterPos();
                 canvas.update();
                 timer_increase_scale.stop();
                 timer_decrease_scale.stop();
@@ -341,8 +342,7 @@ Window {
                 timer_decrease_scale.stop();
             }
             onClicked: {
-                if(canvas.scalingFactor <= 9.9)
-                    canvas.changeScaleWithCentering(0.1);
+                canvas.changeScaleWithCentering(0.1);
                 canvas.update();
             }
         }
@@ -352,7 +352,7 @@ Window {
             repeat: true
             interval: 10
             onTriggered: {
-                if(canvas.scalingFactor <= 9.95 && btn_increase_scale.down)
+                if(btn_increase_scale.down)
                     canvas.changeScaleWithCentering(0.01);
                 else
                     timer_decrease_scale.stop();
@@ -371,8 +371,7 @@ Window {
                 timer_increase_scale.stop();
             }
             onClicked: {
-                if(canvas.scalingFactor > 0.1)
-                    canvas.changeScaleWithCentering(-0.1);
+                canvas.changeScaleWithCentering(-0.1);
                 canvas.update();
             }
         }
@@ -382,7 +381,7 @@ Window {
             repeat: true
             interval: 10
             onTriggered: {
-                if(canvas.scalingFactor > 0.05 && btn_decrease_scale.down)
+                if(btn_decrease_scale.down)
                    canvas.changeScaleWithCentering(-0.01);
                 else
                     timer_increase_scale.stop();

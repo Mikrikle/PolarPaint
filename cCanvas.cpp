@@ -18,6 +18,7 @@ cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
     this->setSmooth(false);
     m_cvs = new QImage(m_cvsSize, m_cvsSize, QImage::Format_ARGB32_Premultiplied);
     m_savedCvs = new QImage(m_cvsSize, m_cvsSize, QImage::Format_ARGB32_Premultiplied);
+    setTempCenterPos();
     clear();
 }
 
@@ -196,6 +197,7 @@ void cCanvas::move(const QPoint &path)
     m_offset += path;
 }
 
+
 void cCanvas::moveCenter()
 {
     m_offset.setX(0);
@@ -207,16 +209,15 @@ void cCanvas::setCvsSize(const int size)
     m_cvsSize = (size > 1?size:2);
     *m_cvs = m_cvs->scaled(m_cvsSize, m_cvsSize);
     *m_savedCvs = m_savedCvs->scaled(m_cvsSize, m_cvsSize);
+    setTempCenterPos();
     update();
 }
 
 void cCanvas::paint(QPainter *ppainter)
 {
     QRect imgRect(
-        width() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)) + m_offset.x(),
-        height() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)) + m_offset.y(),
-        m_cvsSize * (m_scale / m_PixelRatio),
-        m_cvsSize * (m_scale / m_PixelRatio)
+        getRealPosFromLocal(QPoint(0, 0)),
+        QSize(m_cvsSize * (m_scale / m_PixelRatio),m_cvsSize * (m_scale / m_PixelRatio))
         );
     ppainter->setPen(QPen(Qt::black, 2));
     ppainter->drawRect(imgRect);
@@ -227,25 +228,50 @@ void cCanvas::paint(QPainter *ppainter)
     if(m_isDrawCenterPoint)
     {
         ppainter->setPen(QPen(Qt::white, 1));
-        ppainter->drawPoint(width() / 2, height() / 2);
+        ppainter->drawPoint(width() / 2 - 1, height() / 2 - 1);
     }
 }
 
-QPoint cCanvas::getCorrectPos(const QPoint& pos)
+QPoint cCanvas::getLocalPosFromReal(const QPoint& realPos)
 {
     return QPoint(
-        ((pos.x() - m_offset.x() - (width() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)))) / (m_scale / m_PixelRatio)),
-        ((pos.y() - m_offset.y() - (height() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)))) / (m_scale / m_PixelRatio))
+        ((realPos.x() - m_offset.x() - (width() / 2.0 - (m_cvsSize / 2.0 * (m_scale / m_PixelRatio)))) / (m_scale / m_PixelRatio)),
+        ((realPos.y() - m_offset.y() - (height() / 2.0 - (m_cvsSize / 2.0 * (m_scale / m_PixelRatio)))) / (m_scale / m_PixelRatio))
         );
 }
 
 
+QPoint cCanvas::getRealPosFromLocal(const QPoint& localPos)
+{
+    return QPoint(
+        width() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)) + m_offset.x() + (localPos.x() * (m_scale / m_PixelRatio)),
+        height() / 2 - (m_cvsSize / 2 * (m_scale / m_PixelRatio)) + m_offset.y() + (localPos.y() * (m_scale / m_PixelRatio))
+        );
+}
+
+void cCanvas::centeringBy(const QPoint& localPos)
+{
+    QPoint point = getRealPosFromLocal(localPos);
+    QPoint center(width() / 2, height() / 2);
+    move(center - point);
+}
+
+void cCanvas::setTempCenterPos()
+{
+    m_scalingCenterPos = getLocalPosFromReal(QPoint(width() / 2, height() / 2));
+}
+
+void cCanvas::moveScalingCenterTo(const QPoint& localPos, double step)
+{
+    m_scalingCenterPos += (localPos - m_scalingCenterPos) * step;
+}
+
 void cCanvas::changeScaleWithCentering(double scaleChange)
 {
-    QPoint corret_center(getCorrectPos(QPoint(width() / 2, height() / 2)));
-    m_scale += scaleChange;
-    emit scaleChanged(m_scale);
-    move(QPoint((m_cvsSize / 2 - corret_center.x()) / (1 / scaleChange),
-                (m_cvsSize / 2 - corret_center.y()) / (1 / scaleChange))
-         );
+    if((scaleChange > 0 && m_scale + scaleChange < 10.0) || (scaleChange < 0 && m_scale + scaleChange > 0.05))
+    {
+        m_scale += scaleChange;
+        emit scaleChanged(m_scale);
+        centeringBy(m_scalingCenterPos);
+    }
 }

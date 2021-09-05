@@ -62,6 +62,9 @@ private:
     void m_drawPoints(const QList<QPoint> &points, QImage *cvs);
     QPointF m_getPolarCoords(QPoint coords);
 
+    /* ---------SCALING--------- */
+    QPoint m_scalingCenterPos;
+
 public:
     explicit cCanvas(QQuickItem *pqi = nullptr);
     virtual ~cCanvas();
@@ -77,7 +80,11 @@ public:
 
     Q_INVOKABLE bool save();
 
-    Q_INVOKABLE QPoint getCorrectPos(const QPoint& pos);
+    Q_INVOKABLE QPoint getLocalPosFromReal(const QPoint& realPos);
+    Q_INVOKABLE QPoint getRealPosFromLocal(const QPoint& localPos);
+    Q_INVOKABLE void centeringBy(const QPoint& localPos);
+    Q_INVOKABLE void moveScalingCenterTo(const QPoint& localPos, double step);
+    Q_INVOKABLE void setTempCenterPos();
     Q_INVOKABLE void startLine();
     Q_INVOKABLE void continueLine(const QList<QPoint> &points);
 

@@ -10,8 +10,12 @@ MirroredCanvas
         id: area
         anchors.fill: parent
 
+        // draw
         property var pointBuffer: []
-        property var prevPos: ({})
+
+        // move
+        property var prevTouchPoints: []
+        property var scalingCenter: ({})
 
         minimumTouchPoints: 1
         maximumTouchPoints: 5
@@ -23,62 +27,100 @@ MirroredCanvas
             TouchPoint {}
         ]
 
+        function updatePrevTouchPoints()
+        {
+            for(let i = 0; i < this.touchPoints.length; ++i)
+            {
+                if(this.touchPoints[i].pressed)
+                {
+                    prevTouchPoints[i] = Qt.point(this.touchPoints[i].x, this.touchPoints[i].y);
+                }
+                else
+                    break;
+            }
+        }
+
+        function getDistanceBetweenPoints(point1, point2)
+        {
+            let vec = Qt.vector2d(point2.x - point1.x, point2.y - point1.y);
+            return vec.length();
+        }
+
+        function getCenterPointBetween(point1, point2)
+        {
+            let vec = Qt.vector2d(point2.x - point1.x, point2.y - point1.y);
+            return Qt.point(point1.x + vec.x / 2, point1.y + vec.y / 2);
+        }
+
         onPressed: {
             if(!canvas.moveMod)
             {
                 canvas.startLine();
-                canvas.previousPoint = canvas.getCorrectPos(Qt.point(this.touchPoints[0].x, this.touchPoints[0].y));
 
-                pointBuffer[0] = canvas.getCorrectPos(Qt.point(this.touchPoints[0].x, this.touchPoints[0].y));
-                for(let i = 1; i < 5; ++i)
+                pointBuffer[0] = canvas.getLocalPosFromReal(Qt.point(this.touchPoints[0].x, this.touchPoints[0].y));
+                canvas.previousPoint = pointBuffer[0];
+                for(let i = 1; i < this.touchPoints.length; ++i)
                 {
                     if(this.touchPoints[i].pressed)
                     {
-                        pointBuffer[i] = canvas.getCorrectPos(Qt.point(this.touchPoints[i].x, this.touchPoints[i].y));
+                        pointBuffer[i] = canvas.getLocalPosFromReal(Qt.point(this.touchPoints[i].x, this.touchPoints[i].y));
                     }
                     else
-                    {
                         break;
-                    }
                 }
 
                 canvas.continueLine(pointBuffer);
             }
             else
             {
-                pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y)
-                prevPos = this.pointBuffer[0];
+                if(this.touchPoints.length > 1)
+                {
+                    scalingCenter = canvas.getLocalPosFromReal(getCenterPointBetween(this.touchPoints[0], this.touchPoints[1]));
+                }
+
+                updatePrevTouchPoints();
             }
         }
 
         onReleased:
         {
             pointBuffer = [];
+            prevTouchPoints = [];
+            scalingCenter = ({});
         }
 
         onTouchUpdated: {
             if(!canvas.moveMod)
             {
-                for(let i = 0; i < 5; ++i)
+                for(let i = 0; i < this.touchPoints.length; ++i)
                 {
                     if(this.touchPoints[i].pressed)
                     {
-                        pointBuffer[i] = canvas.getCorrectPos(Qt.point(this.touchPoints[i].x, this.touchPoints[i].y));
+                        pointBuffer[i] = canvas.getLocalPosFromReal(Qt.point(this.touchPoints[i].x, this.touchPoints[i].y));
                     }
                     else
-                    {
                         break;
-                    }
                 }
 
                 canvas.continueLine(pointBuffer);
             }
             else
             {
-                pointBuffer[0] = Qt.point(this.touchPoints[0].x, this.touchPoints[0].y)
-                canvas.move(Qt.point(this.pointBuffer[0].x - prevPos.x, this.pointBuffer[0].y - prevPos.y));
+                if(prevTouchPoints.length == 1)
+                {
+                    canvas.move(Qt.point(this.touchPoints[0].x - prevTouchPoints[0].x, this.touchPoints[0].y - prevTouchPoints[0].y));
+                    canvas.setTempCenterPos();
+                }
+                else if(prevTouchPoints.length > 1)
+                {
+                    let old_distance = getDistanceBetweenPoints(prevTouchPoints[0], prevTouchPoints[1]);
+                    let new_distance = getDistanceBetweenPoints(this.touchPoints[0], this.touchPoints[1]);
+                    let zoom = (new_distance - old_distance) / (canvas.width / 2.0);
+                    canvas.changeScaleWithCentering(zoom);
+                    canvas.moveScalingCenterTo(scalingCenter, zoom)
+                }
                 canvas.update();
-                prevPos = pointBuffer[0];
+                updatePrevTouchPoints();
             }
         }
     }
