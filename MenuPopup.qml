@@ -67,90 +67,95 @@ Popup {
         id: view
 
         clip: true
-        currentIndex: 1
+        currentIndex: 0
         anchors.fill: parent
 
-        Item {
+
+        ScrollView {
             id: firstPage
-            ColumnLayout {
-                width: parent.width
-                Label{
-                    Layout.alignment: Qt.AlignCenter
-                    text: qsTr("screen size: ")
-                          + Math.round(main_window.width * Screen.devicePixelRatio)
-                          + "x"
-                          + Math.round(main_window.height * Screen.devicePixelRatio)
-                }
-                SliderBtn{
-                    id: slider_size
-                    implicitWidth: firstPage.width - 110
-                    Layout.alignment: Qt.AlignCenter
-                    from: 100
-                    to: 8000
-                    stepSize: 100
-                    value: 2000
-                    onValueChanged: {
-                        if(canvas)
-                            canvas.setCvsSize(this.value);
+            clip: true
+            Flickable {
+                anchors.left: parent.left
+                contentWidth: parent.width - 25; contentHeight: lmenuCol.height + 100
+                ColumnLayout {
+                    id: lmenuCol
+                    width: parent.width
+
+                    Button {
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignHCenter
+                        icon.source: "qrc:/images/close"
+
+                        onClicked: {
+                            popup.hide();
+                        }
                     }
-                }
-                Label{
-                    Layout.alignment: Qt.AlignCenter
-                    text: qsTr("canvas size: ") + slider_size.value + "x" + slider_size.value
+
+                    Switch {
+                        id: switch_is_draw_center
+                        text: qsTr("draw point at center")
+                        checked: true
+                        onCheckedChanged: {
+                            canvas.update();
+                        }
+                    }
+
+                    Row {
+                        Button {
+                            text: qsTr("save")
+                            onClicked: {
+                                item_wait.visible = true;
+                                timer_save.start();
+                            }
+                        }
+                        Switch {
+                            id: switch_is_save_with_bg
+                            text: qsTr("background")
+                            checked: true
+                        }
+                    }
+                    Button {
+                        text: qsTr("Backround color")
+                        onClicked: {
+                            popup.close();
+                            popup_bgColor.open();
+                        }
+                    }
+
+                    Label{
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("screen size: ")
+                              + Math.round(main_window.width * Screen.devicePixelRatio)
+                              + "x"
+                              + Math.round(main_window.height * Screen.devicePixelRatio)
+                    }
+                    SliderBtn{
+                        id: slider_size
+                        implicitWidth: firstPage.width - 110
+                        Layout.alignment: Qt.AlignCenter
+                        from: 100
+                        to: 8000
+                        stepSize: 100
+                        value: 2000
+                        onValueChanged: {
+                            if(canvas)
+                                canvas.setCvsSize(this.value);
+                        }
+                    }
+                    Label{
+                        Layout.alignment: Qt.AlignCenter
+                        text: qsTr("canvas size: ") + slider_size.value + "x" + slider_size.value
+                    }
                 }
 
-                Switch {
-                    id: switch_is_draw_center
-                    text: qsTr("draw point at center")
-                    checked: true
-                    onCheckedChanged: {
-                        canvas.update();
-                    }
-                }
+                ScrollBar.vertical: ScrollBar { id: vbar; active: true }
+
+                focus: true
             }
         }
 
         Item {
             id: secondPage
-
-            ColumnLayout {
-                width: parent.width
-
-                Button {
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignHCenter
-                    icon.source: "qrc:/images/close"
-
-                    onClicked: {
-                        popup.hide();
-                    }
-                }
-
-                Row {
-                    Button {
-                        text: qsTr("save")
-                        onClicked: {
-                            item_wait.visible = true;
-                            timer_save.start();
-                        }
-                    }
-                    Switch {
-                        id: switch_is_save_with_bg
-                        text: qsTr("background")
-                        checked: true
-                    }
-                }
-                Button {
-                    text: qsTr("Backround color")
-                    onClicked: {
-                        popup.close();
-                        popup_bgColor.open();
-                    }
-                }
-            }
-        }
-        Item {
-            id: thirdPage
             ColumnLayout {
                 Text  {
                     color: "#FFFFFF"
