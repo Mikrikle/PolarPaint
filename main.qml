@@ -36,6 +36,8 @@ Window {
                 slider_BgHColor: bgColorPicker.h_slider.value,
                 slider_BgSColor: bgColorPicker.s_slider.value,
                 slider_BgLColor: bgColorPicker.l_slider.value,
+                property_isDrawAxes: canvas.isDrawAxes,
+                property_axesOpacity: canvas.axesOpacity
 
             }
             return JSON.stringify(data);
@@ -54,6 +56,8 @@ Window {
             bgColorPicker.h_slider.value = json.slider_BgHColor;
             bgColorPicker.s_slider.value = json.slider_BgSColor;
             bgColorPicker.l_slider.value = json.slider_BgLColor;
+            popup_menu.isDrawAxes = json.property_isDrawAxes;
+            popup_menu.slider_axesOpacity.value = json.property_axesOpacity;
         }
 
         Component.onDestruction: {
@@ -144,8 +148,10 @@ Window {
             axes: popup_draw.slider_axes.value
             bgColor: bgColorPicker.hexColor
             pixelRatio: Screen.devicePixelRatio
-            isSaveWithBg: popup_menu.isSaveWithBg;
-            isDrawCenterPoint: popup_menu.isDrawCenterPoint
+            isSaveWithBg: popup_menu.isSaveWithBg
+            isDrawAxes: popup_menu.isDrawAxes
+            axesOpacity: popup_menu.slider_axesOpacity.value
+            cvsSize: popup_menu.slider_cvsSize.value
         }
     }
 

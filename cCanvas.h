@@ -13,15 +13,18 @@ class cCanvas : public QQuickPaintedItem
     Q_OBJECT
     Q_PROPERTY(int brushSize MEMBER m_brushSize NOTIFY brushSizeChanged)
     Q_PROPERTY(QString brushColor MEMBER m_brushColor NOTIFY brushColorChanged)
-    Q_PROPERTY(bool symmetry MEMBER m_isSymmetry NOTIFY symmetryChanged)
-    Q_PROPERTY(int axes MEMBER m_nAxes NOTIFY axesNumChanged)
     Q_PROPERTY(QPoint previousPoint MEMBER m_previuosPoint NOTIFY PreviousPointChanged)
     Q_PROPERTY(QString bgColor MEMBER m_bgColor NOTIFY bgColorChanged)
     Q_PROPERTY(double scalingFactor MEMBER m_scale NOTIFY scaleChanged)
     Q_PROPERTY(bool moveMod MEMBER m_isMoveMod NOTIFY isMoveChanged)
     Q_PROPERTY(double pixelRatio MEMBER m_PixelRatio NOTIFY pixelRatioChanged)
     Q_PROPERTY(bool isSaveWithBg MEMBER m_isSaveBg NOTIFY isBgSaveChanged)
-    Q_PROPERTY(bool isDrawCenterPoint MEMBER m_isDrawCenterPoint NOTIFY isDrawCenterChanged)
+
+    Q_PROPERTY(bool symmetry READ symmetry WRITE setSymmetry NOTIFY symmetryChanged)
+    Q_PROPERTY(int axes READ axes WRITE setAxes NOTIFY axesNumChanged)
+    Q_PROPERTY(bool isDrawAxes READ isDrawAxes WRITE setDrawAxes NOTIFY isDrawAxesChanged)
+    Q_PROPERTY(int axesOpacity READ axesOpacity WRITE setAxesOpacity NOTIFY axesOpacityChanged)
+    Q_PROPERTY(int cvsSize READ cvsSize WRITE setCvsSize NOTIFY cvsSizeChanged)
 
 private:
     /* ---------PROPERTIES--------- */
@@ -35,7 +38,8 @@ private:
     bool m_isMoveMod;
     double m_PixelRatio;
     bool m_isSaveBg;
-    bool m_isDrawCenterPoint;
+    bool m_isDrawAxes;
+    int m_axesOpacity;
 
     /* ---------MAIN CANVAS--------- */
     QImage *m_cvs;
@@ -76,7 +80,6 @@ public:
     Q_INVOKABLE void move(const QPoint& path);
     Q_INVOKABLE void moveCenter();
     Q_INVOKABLE void changeScaleWithCentering(double scaleChange);
-    Q_INVOKABLE void setCvsSize(const int size);
 
     Q_INVOKABLE bool save();
 
@@ -87,6 +90,17 @@ public:
     Q_INVOKABLE void setTempCenterPos();
     Q_INVOKABLE void startLine();
     Q_INVOKABLE void continueLine(const QList<QPoint> &points);
+
+    Q_INVOKABLE bool symmetry();
+    Q_INVOKABLE void setSymmetry(bool symmetry);
+    Q_INVOKABLE int axes();
+    Q_INVOKABLE void setAxes(int nAxes);
+    Q_INVOKABLE bool isDrawAxes();
+    Q_INVOKABLE void setDrawAxes(bool draw);
+    Q_INVOKABLE int axesOpacity();
+    Q_INVOKABLE void setAxesOpacity(int opacity);
+    Q_INVOKABLE int cvsSize();
+    Q_INVOKABLE void setCvsSize(int size);
 
     void paint(QPainter *ppainter) override;
 
@@ -101,7 +115,9 @@ signals:
     void isMoveChanged(bool x);
     void pixelRatioChanged(double ratio);
     void isBgSaveChanged(bool x);
-    void isDrawCenterChanged(bool x);
+    void isDrawAxesChanged(bool x);
+    void axesOpacityChanged(int value);
+    void cvsSizeChanged(int size);
 };
 
 #endif // CCANVAS_H

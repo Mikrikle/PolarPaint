@@ -6,7 +6,9 @@ Popup {
     id: popup
     property Item canvas: null
     property alias isSaveWithBg: switch_is_save_with_bg.checked
-    property alias isDrawCenterPoint: switch_is_draw_center.checked
+    property alias isDrawAxes: switch_is_draw_axes.checked
+    property alias slider_axesOpacity: slider_axesOpacity
+    property alias slider_cvsSize: slider_cvsSize
 
     parent: Overlay.overlay
     closePolicy: Popup.NoAutoClose
@@ -91,60 +93,86 @@ Popup {
                         }
                     }
 
-                    Switch {
-                        id: switch_is_draw_center
-                        text: qsTr("draw point at center")
-                        checked: true
-                        onCheckedChanged: {
-                            canvas.update();
-                        }
-                    }
+                    Pane {
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignHCenter
+                        ColumnLayout{
+                            anchors.fill: parent
+                            Switch {
+                                id: switch_is_draw_axes
+                                text: qsTr("show axes")
+                                checked: true
+                            }
 
-                    Row {
-                        Button {
-                            text: qsTr("save")
-                            onClicked: {
-                                item_wait.visible = true;
-                                timer_save.start();
+                            Label{
+                                Layout.alignment: Qt.AlignCenter
+                                text: qsTr("axes opacity: ") + (Math.round(slider_axesOpacity.value / 255 * 100)) + "%"
+                            }
+                            SliderBtn{
+                                id: slider_axesOpacity
+                                implicitWidth: firstPage.width - 110
+                                Layout.alignment: Qt.AlignCenter
+                                from: 17
+                                to: 255
+                                stepSize: 1
+                                value: 64
                             }
                         }
-                        Switch {
-                            id: switch_is_save_with_bg
-                            text: qsTr("background")
-                            checked: true
+                    }
+                    Pane {
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignHCenter
+                        ColumnLayout{
+                            anchors.fill: parent
+                            Row {
+                                Button {
+                                    text: qsTr("save")
+                                    onClicked: {
+                                        item_wait.visible = true;
+                                        timer_save.start();
+                                    }
+                                }
+                                Switch {
+                                    id: switch_is_save_with_bg
+                                    text: qsTr("background")
+                                    checked: true
+                                }
+                            }
+                            Button {
+                                text: qsTr("Backround color")
+                                onClicked: {
+                                    popup.close();
+                                    popup_bgColor.open();
+                                }
+                            }
                         }
                     }
-                    Button {
-                        text: qsTr("Backround color")
-                        onClicked: {
-                            popup.close();
-                            popup_bgColor.open();
+                    Pane {
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignHCenter
+                        ColumnLayout{
+                            anchors.fill: parent
+                            Label{
+                                Layout.alignment: Qt.AlignCenter
+                                text: qsTr("screen size: ")
+                                      + Math.round(main_window.width * Screen.devicePixelRatio)
+                                      + "x"
+                                      + Math.round(main_window.height * Screen.devicePixelRatio)
+                            }
+                            SliderBtn{
+                                id: slider_cvsSize
+                                implicitWidth: firstPage.width - 110
+                                Layout.alignment: Qt.AlignCenter
+                                from: 100
+                                to: 8000
+                                stepSize: 100
+                                value: 2000
+                            }
+                            Label{
+                                Layout.alignment: Qt.AlignCenter
+                                text: qsTr("canvas size: ") + slider_cvsSize.value + "x" + slider_cvsSize.value
+                            }
                         }
-                    }
-
-                    Label{
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("screen size: ")
-                              + Math.round(main_window.width * Screen.devicePixelRatio)
-                              + "x"
-                              + Math.round(main_window.height * Screen.devicePixelRatio)
-                    }
-                    SliderBtn{
-                        id: slider_size
-                        implicitWidth: firstPage.width - 110
-                        Layout.alignment: Qt.AlignCenter
-                        from: 100
-                        to: 8000
-                        stepSize: 100
-                        value: 2000
-                        onValueChanged: {
-                            if(canvas)
-                                canvas.setCvsSize(this.value);
-                        }
-                    }
-                    Label{
-                        Layout.alignment: Qt.AlignCenter
-                        text: qsTr("canvas size: ") + slider_size.value + "x" + slider_size.value
                     }
                 }
 

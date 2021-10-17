@@ -56,6 +56,8 @@ QString JsonLoader::load(const QString &filename)
             recordObject.insert("slider_BgHColor", QJsonValue::fromVariant(0));
             recordObject.insert("slider_BgSColor", QJsonValue::fromVariant(0));
             recordObject.insert("slider_BgLColor", QJsonValue::fromVariant(10));
+            recordObject.insert("property_isDrawAxes", QJsonValue::fromVariant(true));
+            recordObject.insert("property_axesOpacity", QJsonValue::fromVariant(64));
             QJsonDocument doc(recordObject);
             save(doc.toJson(QJsonDocument::Compact));
 

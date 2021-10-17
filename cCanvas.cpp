@@ -10,7 +10,8 @@ cCanvas::cCanvas(QQuickItem *pqi) : QQuickPaintedItem(pqi)
     , m_isMoveMod(false)
     , m_PixelRatio(1)
     , m_isSaveBg(true)
-    , m_isDrawCenterPoint(true)
+    , m_isDrawAxes(true)
+    , m_axesOpacity(64)
     , m_cvsSize(2000)
     , m_offset(0, 0)
     , m_maxNumSavedLines(25)
@@ -204,31 +205,42 @@ void cCanvas::moveCenter()
     m_offset.setY(0);
 }
 
-void cCanvas::setCvsSize(const int size)
-{
-    m_cvsSize = (size > 1?size:2);
-    *m_cvs = m_cvs->scaled(m_cvsSize, m_cvsSize);
-    *m_savedCvs = m_savedCvs->scaled(m_cvsSize, m_cvsSize);
-    setTempCenterPos();
-    update();
-}
-
 void cCanvas::paint(QPainter *ppainter)
 {
     QRect imgRect(
         getRealPosFromLocal(QPoint(0, 0)),
         QSize(m_cvsSize * (m_scale / m_PixelRatio),m_cvsSize * (m_scale / m_PixelRatio))
         );
+    QRect borderRect(imgRect.topLeft() - QPoint(2, 2), imgRect.size() + QSize(4, 4));
     ppainter->setPen(QPen(Qt::black, 2));
-    ppainter->drawRect(imgRect);
+    ppainter->drawRect(borderRect);
     ppainter->setPen(QPen(Qt::white, 1));
-    ppainter->drawRect(imgRect);
+    ppainter->drawRect(borderRect);
     ppainter->drawImage(imgRect,*m_cvs);
 
-    if(m_isDrawCenterPoint)
+    if(m_isDrawAxes && (m_nAxes > 1 || m_isSymmetry))
     {
-        ppainter->setPen(QPen(Qt::white, 1));
-        ppainter->drawPoint(width() / 2 - 1, height() / 2 - 1);
+        ppainter->setPen(QPen(QColor(255, 255, 255, m_axesOpacity)));
+        float angle = M_PI / 180 * (360.0 / m_nAxes);
+        QPointF posFrom = m_getPolarCoords(QPoint(m_cvsSize / 2, m_cvsSize / 2));
+        QPointF posTo = m_getPolarCoords(QPoint(m_cvsSize / 2, 0));
+        QPointF posTo_symmetry = QPointF(posTo.x(), posTo.y() + angle / 2);
+        for(int axis = 0; axis < m_nAxes; ++axis)
+        {
+            QPoint start(m_cvsSize/2 + cos(posFrom.y() + (angle * axis)) * posFrom.x(),
+                         m_cvsSize/2 + sin(posFrom.y() + (angle * axis)) * posFrom.x());
+            QPoint end(m_cvsSize/2 + cos(posTo.y() + (angle * axis)) * posTo.x(),
+                       m_cvsSize/2 + sin(posTo.y() + (angle * axis)) * posTo.x());
+            ppainter->drawLine(getRealPosFromLocal(start), getRealPosFromLocal(end));
+            if(m_isSymmetry)
+            {
+                QPoint start(m_cvsSize/2 + cos((M_PI - posFrom.y() + (angle * axis))) * posFrom.x(),
+                             m_cvsSize/2 + sin((M_PI - posFrom.y() + (angle * axis))) * posFrom.x());
+                QPoint end(m_cvsSize/2 + cos((M_PI - posTo_symmetry.y() + (angle * axis))) * posTo_symmetry.x(),
+                           m_cvsSize/2 + sin((M_PI - posTo_symmetry.y() + (angle * axis))) * posTo_symmetry.x());
+                ppainter->drawLine(getRealPosFromLocal(start), getRealPosFromLocal(end));
+            }
+        }
     }
 }
 
@@ -274,4 +286,57 @@ void cCanvas::changeScaleWithCentering(double scaleChange)
         emit scaleChanged(m_scale);
         centeringBy(m_scalingCenterPos);
     }
+}
+
+bool cCanvas::symmetry()
+{
+    return m_isSymmetry;
+}
+void cCanvas::setSymmetry(bool symmetry)
+{
+    m_isSymmetry = symmetry;
+    update();
+}
+
+int cCanvas::axes()
+{
+    return m_nAxes;
+}
+void cCanvas::setAxes(int nAxes)
+{
+    m_nAxes = nAxes;
+    update();
+}
+
+bool cCanvas::isDrawAxes()
+{
+    return m_isDrawAxes;
+}
+void cCanvas::setDrawAxes(bool draw)
+{
+    m_isDrawAxes = draw;
+    update();
+}
+
+int cCanvas::axesOpacity()
+{
+    return m_axesOpacity;
+}
+void cCanvas::setAxesOpacity(int opacity)
+{
+    m_axesOpacity = opacity;
+    update();
+}
+
+int cCanvas::cvsSize()
+{
+    return m_cvsSize;
+}
+void cCanvas::setCvsSize(int size)
+{
+    m_cvsSize = (size > 1?size:2);
+    *m_cvs = m_cvs->scaled(m_cvsSize, m_cvsSize);
+    *m_savedCvs = m_savedCvs->scaled(m_cvsSize, m_cvsSize);
+    setTempCenterPos();
+    m_redrawCvs();
 }
