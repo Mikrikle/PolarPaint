@@ -37,6 +37,7 @@ BottomPopup {
             to: 256
             stepSize: 1
             value: 3
+            doubleclickValue: 3
         }
     }
 }

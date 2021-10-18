@@ -69,27 +69,79 @@ Popup {
         id: view
 
         clip: true
-        currentIndex: 0
+        interactive: false
+        currentIndex: 1
         anchors.fill: parent
-
 
         ScrollView {
             id: firstPage
             clip: true
+
+
+            Flickable {
+                anchors.left: parent.left
+                contentWidth: parent.width - 25; contentHeight: infmenuCol.height + 100
+                boundsBehavior: Flickable.StopAtBounds
+
+                ColumnLayout {
+                    id: infmenuCol
+                    width: parent.width
+
+                    RowLayout{
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignHCenter
+
+                        Button {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignHCenter
+                            icon.source: "qrc:/images/arrow_right"
+                            onClicked: {
+                                view.currentIndex  = 1;
+                            }
+                        }
+                    }
+                    Text  {
+                        color: "#FFFFFF"
+                        textFormat: Text.RichText
+                        text: "<h1>About</h1>"
+                    }
+                }
+            }
+        }
+
+
+        ScrollView {
+            id: secondPage
+            clip: true
             Flickable {
                 anchors.left: parent.left
                 contentWidth: parent.width - 25; contentHeight: lmenuCol.height + 100
+                boundsBehavior: Flickable.StopAtBounds
                 ColumnLayout {
                     id: lmenuCol
                     width: parent.width
-
-                    Button {
+                    RowLayout{
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
-                        icon.source: "qrc:/images/close"
 
-                        onClicked: {
-                            popup.hide();
+                        Button {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignHCenter
+                            icon.source: "qrc:/images/arrow_left"
+
+                            onClicked: {
+                                view.currentIndex  = 0;
+                            }
+                        }
+
+                        Button {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignHCenter
+                            icon.source: "qrc:/images/close"
+
+                            onClicked: {
+                                popup.hide();
+                            }
                         }
                     }
 
@@ -116,6 +168,7 @@ Popup {
                                 to: 255
                                 stepSize: 1
                                 value: 64
+                                doubleclickValue: 64
                             }
                         }
                     }
@@ -167,6 +220,7 @@ Popup {
                                 to: 8000
                                 stepSize: 100
                                 value: 2000
+                                doubleclickValue: 2000
                             }
                             Label{
                                 Layout.alignment: Qt.AlignCenter
@@ -179,17 +233,6 @@ Popup {
                 ScrollBar.vertical: ScrollBar { id: vbar; active: true }
 
                 focus: true
-            }
-        }
-
-        Item {
-            id: secondPage
-            ColumnLayout {
-                Text  {
-                    color: "#FFFFFF"
-                    textFormat: Text.RichText
-                    text: "<h1>About</h1>"
-                }
             }
         }
     }

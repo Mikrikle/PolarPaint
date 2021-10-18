@@ -10,6 +10,15 @@ RowLayout {
     property alias value: slider.value
     property alias background: slider.background
     property alias implicitWidth: slider.implicitWidth
+    property int doubleclickValue: 0
+
+
+    Timer{
+        id:dbltimer
+        repeat: false
+        running: false
+        interval: 200
+    }
 
     RoundButton{
         icon.source: "qrc:/images/arrow_left"
@@ -21,6 +30,21 @@ RowLayout {
         id: slider
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter
+
+        onPressedChanged: {
+            if(!pressed)
+            {
+                if(dbltimer.running){
+                    slider.value = doubleclickValue;
+                    dbltimer.stop();
+                }
+                else{
+                    dbltimer.start();
+                }
+            }
+
+        }
+
     }
     RoundButton{
         icon.source: "qrc:/images/arrow_right"

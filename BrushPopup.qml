@@ -19,6 +19,7 @@ BottomPopup {
             to: 100
             stepSize: 1
             value: 1
+            doubleclickValue: 1
         }
     }
 }

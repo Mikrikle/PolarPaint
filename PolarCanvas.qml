@@ -16,6 +16,7 @@ MirroredCanvas
         // move
         property var prevTouchPoints: []
         property var scalingCenter: ({})
+        property bool blockUpdate: false
 
         minimumTouchPoints: 1
         maximumTouchPoints: 5
@@ -26,6 +27,14 @@ MirroredCanvas
             TouchPoint {},
             TouchPoint {}
         ]
+
+        Timer{
+            id:dbltimer
+            repeat: false
+            running: false
+            interval: 200
+        }
+
 
         function updatePrevTouchPoints()
         {
@@ -80,47 +89,70 @@ MirroredCanvas
 
                 updatePrevTouchPoints();
             }
+
         }
 
         onReleased:
         {
+
+            if(canvas.moveMod && prevTouchPoints.length == 1)
+            {
+                if(dbltimer.running)
+                {
+                    canvas.moveMod = false;
+                    blockUpdate = true;
+                    dbltimer.stop();
+                }
+                else
+                {
+                    dbltimer.start();
+                }
+            }
+
             pointBuffer = [];
             prevTouchPoints = [];
             scalingCenter = ({});
         }
 
         onTouchUpdated: {
-            if(!canvas.moveMod)
+            if(!blockUpdate)
             {
-                for(let i = 0; i < this.touchPoints.length; ++i)
+                if(!canvas.moveMod)
                 {
-                    if(this.touchPoints[i].pressed)
+                    for(let i = 0; i < this.touchPoints.length; ++i)
                     {
-                        pointBuffer[i] = canvas.getLocalPosFromReal(Qt.point(this.touchPoints[i].x, this.touchPoints[i].y));
+                        if(this.touchPoints[i].pressed)
+                        {
+                            pointBuffer[i] = canvas.getLocalPosFromReal(Qt.point(this.touchPoints[i].x, this.touchPoints[i].y));
+                        }
+                        else
+                            break;
                     }
-                    else
-                        break;
-                }
 
-                canvas.continueLine(pointBuffer);
+                    canvas.continueLine(pointBuffer);
+                }
+                else
+                {
+                    if(prevTouchPoints.length == 1)
+                    {
+                        canvas.move(Qt.point(this.touchPoints[0].x - prevTouchPoints[0].x, this.touchPoints[0].y - prevTouchPoints[0].y));
+                        canvas.setTempCenterPos();
+                    }
+                    else if(prevTouchPoints.length > 1)
+                    {
+                        let old_distance = getDistanceBetweenPoints(prevTouchPoints[0], prevTouchPoints[1]);
+                        let new_distance = getDistanceBetweenPoints(this.touchPoints[0], this.touchPoints[1]);
+                        let zoom = (new_distance - old_distance) / (canvas.width / 2.0);
+                        canvas.changeScaleWithCentering(zoom);
+                        canvas.moveScalingCenterTo(scalingCenter, zoom)
+                    }
+                    canvas.update();
+                    updatePrevTouchPoints();
+                }
             }
             else
             {
-                if(prevTouchPoints.length == 1)
-                {
-                    canvas.move(Qt.point(this.touchPoints[0].x - prevTouchPoints[0].x, this.touchPoints[0].y - prevTouchPoints[0].y));
-                    canvas.setTempCenterPos();
-                }
-                else if(prevTouchPoints.length > 1)
-                {
-                    let old_distance = getDistanceBetweenPoints(prevTouchPoints[0], prevTouchPoints[1]);
-                    let new_distance = getDistanceBetweenPoints(this.touchPoints[0], this.touchPoints[1]);
-                    let zoom = (new_distance - old_distance) / (canvas.width / 2.0);
-                    canvas.changeScaleWithCentering(zoom);
-                    canvas.moveScalingCenterTo(scalingCenter, zoom)
-                }
-                canvas.update();
-                updatePrevTouchPoints();
+                blockUpdate = false;
             }
         }
     }

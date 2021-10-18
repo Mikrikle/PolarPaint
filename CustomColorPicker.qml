@@ -12,7 +12,7 @@ ColumnLayout {
 
     property bool isUseAlpha: true
 
-    property var defaultValues: {'a':255, 'h':100,'s':0, 'l':0}
+    property var defaultValues: {'a':255, 'h':100,'s':100, 'l':50}
 
     width: parent.width
 
@@ -43,6 +43,7 @@ ColumnLayout {
             to: 255
             stepSize: 1
             value: defaultValues.a
+            doubleclickValue: defaultValues.a
 
             background: Rectangle{
                 width: parent.height * 0.4
@@ -76,6 +77,7 @@ ColumnLayout {
             to: 360
             stepSize: 1
             value: defaultValues.h
+            doubleclickValue: defaultValues.h
 
 
             background: Rectangle{
@@ -133,6 +135,7 @@ ColumnLayout {
             to: 100
             stepSize: 1
             value: defaultValues.s
+            doubleclickValue: defaultValues.s
 
             background: Rectangle{
                 width: parent.height * 0.4
@@ -163,6 +166,7 @@ ColumnLayout {
             to: 100
             stepSize: 1
             value: defaultValues.l
+            doubleclickValue: defaultValues.l
 
             background: Rectangle{
                 width: parent.height * 0.4
