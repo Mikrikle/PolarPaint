@@ -21,6 +21,16 @@ Popup {
 
     scale: 0
 
+    background: Rectangle {
+        color:"transparent"
+        Rectangle {
+            width: 1
+            anchors.fill: parent
+            radius: 10
+            color: Material.background
+        }
+    }
+
     function hide() {
         close();
         scale = 0.00;
@@ -51,14 +61,16 @@ Popup {
     Dialog {
         id: dialog_save
         modal: true
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
         standardButtons: Dialog.Ok
     }
 
     Popup {
+        id: popup_setBg
         width: parent.width - 10;
         x: Math.round((parent.width - width) / 2)
         y: parent.height - height - menu_bottom.height
-        id: popup_setBg
         focus: true
         CustomColorPicker {
             id: bgColorPicker
@@ -76,8 +88,6 @@ Popup {
         ScrollView {
             id: firstPage
             clip: true
-
-
             Flickable {
                 anchors.left: parent.left
                 contentWidth: parent.width - 25; contentHeight: infmenuCol.height + 100
@@ -106,6 +116,12 @@ Popup {
                         text: "<h1>About</h1>"
                     }
                 }
+
+                ScrollBar.vertical: ScrollBar {
+                    id: vbar2
+                    active: true
+                    policy: ScrollBar.AlwaysOn
+                }
             }
         }
 
@@ -120,6 +136,7 @@ Popup {
                 ColumnLayout {
                     id: lmenuCol
                     width: parent.width
+                    spacing: 10
                     RowLayout{
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
@@ -148,17 +165,18 @@ Popup {
                     Pane {
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
+                        Material.elevation: 6
                         ColumnLayout{
                             anchors.fill: parent
                             Switch {
                                 id: switch_is_draw_axes
-                                text: qsTr("show axes")
+                                text: qsTr("Show axes")
                                 checked: true
                             }
 
                             Label{
                                 Layout.alignment: Qt.AlignCenter
-                                text: qsTr("axes opacity: ") + (Math.round(slider_axesOpacity.value / 255 * 100)) + "%"
+                                text: qsTr("Axes opacity") + ": " + (Math.round(slider_axesOpacity.value / 255 * 100)) + "%"
                             }
                             SliderBtn{
                                 id: slider_axesOpacity
@@ -172,24 +190,33 @@ Popup {
                             }
                         }
                     }
+
                     Pane {
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
+                        Material.elevation: 6
                         ColumnLayout{
                             anchors.fill: parent
-                            Row {
-                                Button {
-                                    text: qsTr("save")
-                                    onClicked: {
-                                        item_wait.visible = true;
-                                        timer_save.start();
-                                    }
+                            Button {
+                                text: qsTr("Save")
+                                onClicked: {
+                                    item_wait.visible = true;
+                                    timer_save.start();
                                 }
-                                Switch {
-                                    id: switch_is_save_with_bg
-                                    text: qsTr("background")
-                                    checked: true
-                                }
+                            }
+                        }
+                    }
+
+                    Pane {
+                        Layout.fillWidth: true
+                        Layout.alignment: Qt.AlignHCenter
+                        Material.elevation: 6
+                        ColumnLayout{
+                            anchors.fill: parent
+                            Switch {
+                                id: switch_is_save_with_bg
+                                text: qsTr("Save with background")
+                                checked: true
                             }
                             Button {
                                 text: qsTr("Backround color")
@@ -200,14 +227,16 @@ Popup {
                             }
                         }
                     }
+
                     Pane {
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter
+                        Material.elevation: 6
                         ColumnLayout{
                             anchors.fill: parent
                             Label{
                                 Layout.alignment: Qt.AlignCenter
-                                text: qsTr("screen size: ")
+                                text: qsTr("Screen size") + ": "
                                       + Math.round(main_window.width * Screen.devicePixelRatio)
                                       + "x"
                                       + Math.round(main_window.height * Screen.devicePixelRatio)
@@ -224,13 +253,17 @@ Popup {
                             }
                             Label{
                                 Layout.alignment: Qt.AlignCenter
-                                text: qsTr("canvas size: ") + slider_cvsSize.value + "x" + slider_cvsSize.value
+                                text: qsTr("Canvas size") + ": " + slider_cvsSize.value + "x" + slider_cvsSize.value
                             }
                         }
                     }
                 }
 
-                ScrollBar.vertical: ScrollBar { id: vbar; active: true }
+                ScrollBar.vertical: ScrollBar {
+                    id: vbar
+                    active: true
+                    policy: ScrollBar.AlwaysOn
+                }
 
                 focus: true
             }
@@ -243,7 +276,7 @@ Popup {
         count: view.count
         currentIndex: view.currentIndex
 
-        anchors.top: view.bottom
+        anchors.bottom: view.bottom
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
@@ -255,11 +288,11 @@ Popup {
         onTriggered: {
             if(canvas.save())
             {
-                dialog_save.title = "Successfully saved";
+                dialog_save.title = qsTr("Successfully saved");
             }
             else
             {
-                dialog_save.title = "Error: unable to save";
+                dialog_save.title = qsTr("Error: unable to save");
             }
             dialog_save.open();
             item_wait.visible = false;

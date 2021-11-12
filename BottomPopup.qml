@@ -15,9 +15,9 @@ Popup {
             width: 1
             anchors.fill: parent
             radius: 10
-            color: "#414141"
+            color: Material.background
+            opacity: 0.9
         }
-
     }
 
 }

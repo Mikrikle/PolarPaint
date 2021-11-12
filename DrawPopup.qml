@@ -16,7 +16,7 @@ BottomPopup {
             width: parent.width
 
             Label {
-                text: qsTr("symmetry: ") + switch_symmetry.checked
+                text: qsTr("symmetry") + ": " + switch_symmetry.checked
                 Layout.alignment: Qt.AlignCenter
             }
 
@@ -27,7 +27,7 @@ BottomPopup {
         }
 
         Label {
-            text: qsTr("number of axes: ") + slider_axes.value
+            text: qsTr("number of axes") + ": " + slider_axes.value
         }
 
         SliderBtn

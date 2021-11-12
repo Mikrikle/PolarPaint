@@ -12,7 +12,7 @@ Window {
     width: 400
     minimumHeight: 300
     height: 600
-    title: qsTr("paint")
+    title: "PolarPaint"
 
     Material.theme: Material.Dark
     Material.accent: Material.Green
@@ -107,7 +107,7 @@ Window {
                 }
                 PropertyChanges{
                     target: menu_right
-                    scale: 0.8
+                    scale: 0.9
                 }
             }
         ]
@@ -123,7 +123,18 @@ Window {
                     easing.type: Easing.OutBack
                     duration: 500
                 }
-
+                PropertyAnimation {
+                    target: btn_interface_states_switcher
+                    properties: "rotation"
+                    easing.type: Easing.OutQuart
+                    duration: 500
+                }
+                PropertyAnimation {
+                    target: menu_right
+                    properties: "scale"
+                    easing.type: Easing.OutBack
+                    duration: 500
+                }
             }
         ]
 

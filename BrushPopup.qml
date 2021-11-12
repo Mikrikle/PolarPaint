@@ -10,7 +10,7 @@ BottomPopup {
         x: 0
         y: parent.height - height
         Label {
-            text: qsTr("brush size: ") + slider_brush_size.value
+            text: qsTr("brush size") + ": " + slider_brush_size.value
         }
         SliderBtn
         {

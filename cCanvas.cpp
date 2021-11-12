@@ -112,7 +112,7 @@ QPointF cCanvas::m_getPolarCoords(QPoint coords)
     float f = atan(static_cast<float>(pos.y()) / pos.x());
     if (pos.x() < 0)
         f += M_PI;
-    return QPointF(radius, f);
+    return QPointF(trunc(radius), f);
 }
 
 
@@ -164,10 +164,8 @@ void cCanvas::m_drawPoints(const QList<QPoint> &points, QImage *cvs)
 Q_INVOKABLE bool cCanvas::save()
 {
 
-    QString filename = "PolarPaint-" + QDateTime::currentDateTime().toString("dd-MM-yy-hh-mm-ss-zzz") + ".png";
-    QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)
-                   + "/" + filename;
-
+    QBuffer buffer;
+    buffer.open(QIODevice::WriteOnly);
     if(m_isSaveBg)
     {
         QImage tmp(m_cvs->size(), m_cvs->format());
@@ -175,12 +173,32 @@ Q_INVOKABLE bool cCanvas::save()
 
         QPainter painter(&tmp);
         painter.drawImage(QPoint(0, 0), *m_cvs);
-        return tmp.save(path);
+        tmp.save(&buffer, "PNG");
     }
     else
     {
-        return m_cvs->save(path);
+        m_cvs->save(&buffer, "PNG");
     }
+    buffer.close();
+
+    QString filename = "PolarPaint-" + QDateTime::currentDateTime().toString("dd-MM-yy-hh-mm-ss-zzz") + ".png";
+    QString path = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)
+                   + "/" + filename;
+
+    QFile file(path);
+    if(file.open(QIODevice::WriteOnly))
+    {
+        file.write(buffer.buffer());
+        file.close();
+    }
+    else
+    {
+        return false;
+    }
+    if(file.error() != QFileDevice::NoError)
+        return false;
+    return true;
+
 }
 
 
@@ -220,6 +238,7 @@ void cCanvas::paint(QPainter *ppainter)
 
     if(m_isDrawAxes && (m_nAxes > 1 || m_isSymmetry))
     {
+        ppainter->setRenderHint(QPainter::Antialiasing, true);
         ppainter->setPen(QPen(QColor(255, 255, 255, m_axesOpacity)));
         float angle = M_PI / 180 * (360.0 / m_nAxes);
         QPointF posFrom = m_getPolarCoords(QPoint(m_cvsSize / 2, m_cvsSize / 2));
